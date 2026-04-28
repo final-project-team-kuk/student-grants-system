@@ -1,0 +1,85 @@
+[
+  {
+    "_id": "77b111111111111111111111",
+    "userId": "66a111111111111111111111",
+    "status": "pending",
+    "createdAt": "2026-04-28T10:00:00Z",
+
+    "personal": {
+      "birthDate": "2000-05-10",
+      "city": "Jerusalem",
+      "address": "Herzl 10",
+      "phone": "02-1234567",
+      "mobile": "0501234567"
+    },
+
+    "family": {
+      "father": { "id": "111111111", "name": "David Levi" },
+      "mother": { "id": "222222222", "name": "Sara Levi" },
+      "siblings": [
+        { "id": "333333333", "name": "Yossi Levi" }
+      ]
+    },
+
+    "education": {
+      "institution": "Hebrew University",
+      "field": "Computer Science",
+      "years": 3,
+      "tuition": 12000
+    },
+
+    "bank": {
+      "bankName": "Hapoalim",
+      "branch": "123",
+      "accountNumber": "456789",
+      "ownerId": "123456789"
+    },
+
+    "files": {
+      "idDocs": ["id1.pdf"],
+      "studyApproval": "study1.pdf",
+      "bankApproval": "bank1.pdf"
+    }
+  },
+
+  {
+    "_id": "77b222222222222222222222",
+    "userId": "66a222222222222222222222",
+    "status": "approved",
+    "createdAt": "2026-04-27T09:00:00Z",
+
+    "personal": {
+      "birthDate": "1999-02-15",
+      "city": "Tel Aviv",
+      "address": "Rothschild 5",
+      "phone": "03-1111111",
+      "mobile": "0509999999"
+    },
+
+    "family": {
+      "father": { "id": "444444444", "name": "Moshe Cohen" },
+      "mother": { "id": "555555555", "name": "Rivka Cohen" },
+      "siblings": []
+    },
+
+    "education": {
+      "institution": "TAU",
+      "field": "Engineering",
+      "years": 4,
+      "tuition": 14000
+    },
+
+    "bank": {
+      "bankName": "Leumi",
+      "branch": "321",
+      "accountNumber": "987654",
+      "ownerId": "987654321"
+    },
+
+    "files": {
+      "idDocs": ["id2.pdf"],
+      "studyApproval": "study2.pdf",
+      "bankApproval": "bank2.pdf"
+    }
+  }
+]
