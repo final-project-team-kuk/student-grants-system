@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-export default function FormStepTwo() {
+export default function FromStepTwo() {
   const steps = ['פרטים אישיים', 'פרטי משפחה', 'פרטי לימודים', 'פרטי בנק', 'העלאת קבצים', 'אישור ושליחה'];
 
   return (

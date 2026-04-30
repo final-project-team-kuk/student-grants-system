@@ -17,7 +17,7 @@ export default function Navbar({ currentPage, setCurrentPage }) {
       <div className="hidden md:flex gap-6 text-sm">
         <button 
           onClick={() => setCurrentPage('dashboard')}
-          className={`transition px-4 py-1.5 rounded-full font-medium ${currentPage === 'dashboard' ? 'bg-[#1f4ea8]/20 text-[#1f4ea8]' : 'text-[#cbd5ea] hover:text-white'}`}
+          className={`transition px-4 py-1.5 rounded-full font-medium ${currentPage === 'dashboard' ? 'bg-[#1f4ea8]/20 text-[#E5DED0]' : 'text-[#cbd5ea] hover:text-white'}`}
         >
           דף הבית
         </button>

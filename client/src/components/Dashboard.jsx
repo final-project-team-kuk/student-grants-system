@@ -3,7 +3,7 @@ import React from 'react';
 
 export default function Dashboard({ setCurrentPage }) {
   return (
-    <div className="min-h-screen bg-[#f4f2ec] px-4 py-16">
+    <div className="min-h-screen bg-[#E8E3D7]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, ישראל 👋</h1>
@@ -11,8 +11,9 @@ export default function Dashboard({ setCurrentPage }) {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* כרטיסיית הגשת בקשה */}
-          <div
+          {/* כפתור הגשת בקשה */}
+          <button
+            type="button"
             onClick={() => setCurrentPage('form')}
             className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group"
           >
@@ -31,10 +32,10 @@ export default function Dashboard({ setCurrentPage }) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </span>
             </div>
-          </div>
+          </button>
 
-          {/* כרטיסיית סטטוס */}
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group">
+          {/* כפתור סטטוס */}
+          <button type="button" className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group">
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
 
             <div className="flex flex-col items-center text-center relative z-10">
@@ -50,7 +51,7 @@ export default function Dashboard({ setCurrentPage }) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import './App.css';
 import { MainComponent } from './components/MainComponent';
 import Navbar from './components/NavBar.jsx';
 import Dashboard from './components/Dashboard.jsx';
-import FormStepTwo from './components/FromStepTwo.jsx';
+import FromStepTwo from './components/FromStepTwo.jsx';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -18,7 +18,7 @@ function App() {
           <Dashboard setCurrentPage={setCurrentPage} />
         )}
 
-        {currentPage === 'form' && <FormStepTwo />}
+        {currentPage === 'form' && <FromStepTwo />}
 
         {currentPage === 'main' && <MainComponent />}
       </main>
