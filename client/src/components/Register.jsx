@@ -20,10 +20,25 @@ export default function Register({ onSwitchToLogin }) {
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
-  };
+const handleSubmit = async () => {
+  setIsLoading(true);
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+
+    if (response.ok) {
+      alert("נרשמת בהצלחה!");
+      onSwitchToLogin();
+    }
+  } catch (error) {
+    console.error("שגיאה ברישום:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const fields = [
     { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
