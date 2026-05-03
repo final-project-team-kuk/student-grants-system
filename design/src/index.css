@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+body {
+  direction: rtl;
+  background-color: #f4f2ec; /* צבע רקע שמנת מדויק */
+  color: #0f172a;
+  margin: 0;
+  padding: 0;
+}
