@@ -4,7 +4,7 @@ import Dashboard from "../Dashboard"
 import FromStepTwo from "../FromStepTwo"
 import Login from "../Login"
 import Register from "../Register"
-import AdminRequests from "../../admin-requests.jsx"
+import AdminRequests from "../admin-requests.jsx"
 import Navbar from "./NavBar"
 
 export const Router =() =>{
