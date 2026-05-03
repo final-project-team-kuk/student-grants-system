@@ -41,41 +41,41 @@ const handleSubmit = async () => {
 };
 
   const fields = [
+    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
     { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
     { key: "lastName",        label: "שם משפחה",      placeholder: "הזן שם משפחה",     type: "text"     },
-    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
     { key: "password",        label: "סיסמה",         placeholder: "בחר סיסמה",        type: "password" },
     { key: "confirmPassword", label: "אימות סיסמה",   placeholder: "הזן סיסמה שוב",   type: "password" },
   ];
 
   return (
-    <div style={styles.root}>
+    <div className="min-h-screen bg-[#F2EDE4] flex items-center justify-center font-heebo rtl relative overflow-hidden p-10 px-4">
       {/* כתמים בולטים יותר ברקע */}
-      <div style={styles.blob1} />
-      <div style={styles.blob2} />
+      <div className="fixed w-[580px] h-[580px] rounded-full bg-[radial-gradient(circle,rgba(10,25,47,0.18)_0%,transparent_70%)] -top-[120px] -left-[100px] blur-[80px] animate-[blobFloat_8s_ease-in-out_infinite] pointer-events-none" />
+      <div className="fixed w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(10,25,47,0.14)_0%,transparent_70%)] -bottom-[80px] -right-[60px] blur-[70px] animate-[blobFloat_10s_ease-in-out_infinite_reverse] pointer-events-none" />
 
-      <div style={styles.container}>
+      <div className="flex flex-col items-center gap-4 animate-[fadeUp_0.7s_ease_both] z-10 w-full max-w-[480px]">
+        {/* Title */}
+        <h1 className="text-[#0A192F] text-[26px] font-extrabold tracking-[-0.3px] text-center">מערכת מענקים לסטודנטים</h1>
+        <p className="text-[#5C6370] text-sm font-light text-center -mt-2">ניהול בקשות מענק אקדמי</p>
+
         {/* Logo */}
-        <div style={styles.logoWrap}>
-          <div style={styles.logoIcon}>{gradCap}</div>
+        <div className="mb-1">
+          <div className="w-17 h-17 rounded-[18px] bg-[#0A192F] flex items-center justify-center shadow-[0_8px_32px_rgba(10,25,47,0.25)]">{gradCap}</div>
         </div>
 
-        {/* Title */}
-        <h1 style={styles.title}>מערכת מענקים לסטודנטים</h1>
-        <p style={styles.subtitle}>ניהול בקשות מענק אקדמי</p>
-
         {/* Card */}
-        <div style={styles.card}>
+        <div className="mt-2 w-full bg-white/70 backdrop-blur-[18px] border border-[#0A192F]/10 rounded-[20px] p-7 pb-6 flex flex-col gap-[18px] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
           {/* Tabs */}
-          <div style={styles.tabRow}>
+          <div className="flex rounded-[12px] bg-[#E5E0D5] p-1 gap-1">
             <button
-              style={{ ...styles.tab, ...(activeTab === "register" ? styles.tabActive : styles.tabInactive) }}
+              className={`flex-1 py-[10px] rounded-[9px] border-none cursor-pointer text-[15px] font-heebo font-semibold transition-all duration-300 ease-in-out ${activeTab === "register" ? "bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]" : "bg-transparent text-[#5C6370]"}`}
               onClick={() => setActiveTab("register")}
             >
               הרשמה
             </button>
             <button
-              style={{ ...styles.tab, ...(activeTab === "login" ? styles.tabActive : styles.tabInactive) }}
+              className={`flex-1 py-[10px] rounded-[9px] border-none cursor-pointer text-[15px] font-heebo font-semibold transition-all duration-300 ease-in-out ${activeTab === "login" ? "bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]" : "bg-transparent text-[#5C6370]"}`}
               onClick={() => { setActiveTab("login"); onSwitchToLogin?.(); }}
             >
               כניסה למערכת
@@ -84,10 +84,10 @@ const handleSubmit = async () => {
 
           {/* Fields */}
           {fields.map(({ key, label, placeholder, type }) => (
-            <div key={key} style={styles.fieldGroup}>
-              <label style={styles.label}>{label}</label>
+            <div key={key} className="flex flex-col gap-[7px]">
+              <label className="text-[#0A192F] text-sm font-medium text-right">{label}</label>
               <input
-                style={styles.input}
+                className="bg-white border border-[#D1D5DB] rounded-[12px] p-[13px_18px] text-[#0A192F] text-[15px] font-heebo text-right w-full transition-[border-color_0.2s,box-shadow_0.2s]"
                 type={type}
                 value={form[key]}
                 onChange={handleChange(key)}
@@ -99,7 +99,7 @@ const handleSubmit = async () => {
 
           {/* Submit */}
           <button
-            style={{ ...styles.submitBtn, ...(isLoading ? styles.submitBtnLoading : {}) }}
+            className={`w-full p-[15px] rounded-[12px] border-none bg-[#0A192F] text-[#F5F1E9] text-[16px] font-bold font-heebo cursor-pointer tracking-[0.3px] shadow-[0_6px_24px_rgba(10,25,47,0.2)] mt-1 ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
             onClick={handleSubmit}
             disabled={isLoading}
           >
@@ -107,201 +107,14 @@ const handleSubmit = async () => {
           </button>
 
           {/* Footer */}
-          <p style={styles.footerText}>
+          <p className="text-[#5C6370] text-[13px] text-center -mt-1">
             כבר יש לך חשבון?{" "}
-            <span style={styles.footerLink} onClick={() => onSwitchToLogin?.()}>
+            <span className="text-[#0A192F] cursor-pointer font-semibold underline underline-offset-2" onClick={() => onSwitchToLogin?.()}>
               כניסה למערכת
             </span>
           </p>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        input::placeholder { color: #A0AEC0; }
-        input:focus { outline: none; border-color: #0A192F !important; box-shadow: 0 0 0 3px rgba(10,25,47,0.15); }
-        button { transition: opacity 0.2s, transform 0.15s; }
-        button:hover:not(:disabled) { opacity: 0.92; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes blobFloat {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50%       { transform: translateY(-30px) scale(1.05); }
-        }
-      `}</style>
     </div>
   );
 }
-
-const styles = {
-  root: {
-    minHeight: "100vh",
-    background: "#F2EDE4",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'Heebo', sans-serif",
-    direction: "rtl",
-    position: "relative",
-    overflow: "hidden",
-    padding: "40px 16px",
-  },
-  blob1: {
-    position: "fixed",
-    width: 580,
-    height: 580,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
-    top: "-120px",
-    left: "-100px",
-    filter: "blur(80px)",
-    animation: "blobFloat 8s ease-in-out infinite",
-    pointerEvents: "none",
-  },
-  blob2: {
-    position: "fixed",
-    width: 450,
-    height: 450,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
-    bottom: "-80px",
-    right: "-60px",
-    filter: "blur(70px)",
-    animation: "blobFloat 10s ease-in-out infinite reverse",
-    pointerEvents: "none",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "16px",
-    animation: "fadeUp 0.7s ease both",
-    zIndex: 1,
-    width: "100%",
-    maxWidth: 480,
-  },
-  logoWrap: { marginBottom: 4 },
-  logoIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    background: "#0A192F",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 8px 32px rgba(10,25,47,0.25)",
-  },
-  title: {
-    color: "#0A192F",
-    fontSize: 26,
-    fontWeight: 800,
-    letterSpacing: "-0.3px",
-    textAlign: "center",
-  },
-  subtitle: {
-    color: "#5C6370",
-    fontSize: 14,
-    fontWeight: 300,
-    textAlign: "center",
-    marginTop: -8,
-  },
-  card: {
-    marginTop: 8,
-    width: "100%",
-    background: "rgba(255, 255, 255, 0.7)",
-    backdropFilter: "blur(18px)",
-    WebkitBackdropFilter: "blur(18px)",
-    border: "1px solid rgba(10,25,47,0.1)",
-    borderRadius: 20,
-    padding: "28px 28px 24px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 18,
-    boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
-  },
-  tabRow: {
-    display: "flex",
-    borderRadius: 12,
-    background: "#E5E0D5",
-    padding: 4,
-    gap: 4,
-  },
-  tab: {
-    flex: 1,
-    padding: "10px 0",
-    borderRadius: 9,
-    border: "none",
-    cursor: "pointer",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    fontWeight: 600,
-    transition: "all 0.22s ease",
-  },
-  tabActive: {
-    background: "#0A192F",
-    color: "#F5F1E9",
-    boxShadow: "0 4px 14px rgba(10,25,47,0.2)",
-  },
-  tabInactive: {
-    background: "transparent",
-    color: "#5C6370",
-  },
-  fieldGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 7,
-  },
-  label: {
-    color: "#0A192F",
-    fontSize: 14,
-    fontWeight: 500,
-    textAlign: "right",
-  },
-  input: {
-    background: "#ffffff",
-    border: "1px solid #D1D5DB",
-    borderRadius: 12,
-    padding: "13px 18px",
-    color: "#0A192F",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    textAlign: "right",
-    width: "100%",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  },
-  submitBtn: {
-    width: "100%",
-    padding: "15px",
-    borderRadius: 12,
-    border: "none",
-    background: "#0A192F",
-    color: "#F5F1E9",
-    fontSize: 16,
-    fontWeight: 700,
-    fontFamily: "'Heebo', sans-serif",
-    cursor: "pointer",
-    letterSpacing: "0.3px",
-    boxShadow: "0 6px 24px rgba(10,25,47,0.2)",
-    marginTop: 4,
-  },
-  submitBtnLoading: {
-    opacity: 0.7,
-    cursor: "not-allowed",
-  },
-  footerText: {
-    color: "#5C6370",
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: -4,
-  },
-  footerLink: {
-    color: "#0A192F",
-    cursor: "pointer",
-    fontWeight: 600,
-    textDecoration: "underline",
-    textUnderlineOffset: 2,
-  },
-};

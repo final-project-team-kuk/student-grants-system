@@ -1,3 +1,16 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap');
+
+@config {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"];
+  theme: {
+    fontFamily: {
+      'heebo': ['Heebo', 'sans-serif'],
+    }
+  }
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -109,3 +122,19 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blobFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+input::placeholder { color: #A0AEC0; }
+input:focus { outline: none; border-color: #0A192F !important; box-shadow: 0 0 0 3px rgba(10,25,47,0.15); }
+button { transition: opacity 0.2s, transform 0.15s; }
+button:hover:not(:disabled) { opacity: 0.92; }
