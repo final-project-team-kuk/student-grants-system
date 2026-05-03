@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { Router } from './components/routing/Router.jsx';
+
+import { MainComponent } from './components/MainComponent';
+import Navbar from './components/NavBar.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import FromStepTwo from './components/FromStepTwo.jsx';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('dashboard');
+
   return (
     <div className="min-h-screen bg-[#f4f2ec] font-sans" dir="rtl">
-      <Router />
-    </div>
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
-     
-    
+      <main>
+        {currentPage === 'dashboard' && (
+          <Dashboard setCurrentPage={setCurrentPage} />
+        )}
+
+        {currentPage === 'form' && <FromStepTwo />}
+
+        {currentPage === 'main' && <MainComponent />}
+      </main>
+    </div>
   );
 }
 
