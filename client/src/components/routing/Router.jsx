@@ -5,7 +5,7 @@ export const Router =() =>{
     return<>
     <BrowserRouter>
     <Routes>
-        <Route path="" element={<MainComponent></MainComponent>}></Route>
+        <Route path="/" element={<MainComponent></MainComponent>}></Route>
     </Routes>
     </BrowserRouter>
     </>
