@@ -1,10 +1,11 @@
-
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // 1. מייבאים את הכלי החדש של ריאקט
 
-export default function Dashboard({ setCurrentPage }) {
+export default function Dashboard() {
+  const navigate = useNavigate(); // 2. יוצרים את ה"מנווט" שלנו
+
   return (
-    <div className="min-h-screen bg-[#E8E3D7]">
+    <div className="min-h-screen   background-color: #f4f2ec; pt-24 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, ישראל 👋</h1>
@@ -15,8 +16,8 @@ export default function Dashboard({ setCurrentPage }) {
           {/* כפתור הגשת בקשה */}
           <button
             type="button"
-            onClick={() => setCurrentPage('form')}
-            className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group"
+            onClick={() => navigate('/from-step-two')} // 3. בלחיצה על הכפתור -> נווט לטופס!
+            className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full"
           >
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
 
@@ -28,15 +29,17 @@ export default function Dashboard({ setCurrentPage }) {
               </div>
               <h2 className="text-xl font-bold text-[#071325] mb-3">הגשת בקשה חדשה</h2>
               <p className="text-[#071325] text-sm mb-6 leading-relaxed">הגש בקשה למענק אקדמי. מלא את הפרטים האישיים, פרטי המשפחה, הלימודים והבנק.</p>
-              <span className="text-[#071325] text-sm flex items-center gap-1">
-               <NavLink to ="/form-step-two" className="text-[#071325] hover:text-[#1d4f8f] transition"> הגשת בקשה </NavLink>
+              <span className="text-[#071325] text-sm flex items-center justify-center gap-1 group-hover:text-[#1d4f8f] transition">
+                הגשת בקשה
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </span>
             </div>
           </button>
 
           {/* כפתור סטטוס */}
-          <button type="button" className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group">
+          <button type="button"
+          onClick={() => navigate('/statusRequest (2)')} // 3. בלחיצה על הכפתור -> נווט לעמוד סטטוס!
+          className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full">
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
 
             <div className="flex flex-col items-center text-center relative z-10">
@@ -47,7 +50,7 @@ export default function Dashboard({ setCurrentPage }) {
               </div>
               <h2 className="text-xl font-bold text-[#071325] mb-3">צפייה בסטטוס בקשה</h2>
               <p className="text-[#071325] text-sm mb-6 leading-relaxed">בדוק את מצב הבקשה האחרונה שהגשת ועקוב אחר התקדמות הטיפול בה.</p>
-              <span className="text-[#071325] text-sm flex items-center gap-1 group-hover:text-[#1d4f8f] transition">
+              <span className="text-[#071325] text-sm flex items-center justify-center gap-1 group-hover:text-[#1d4f8f] transition">
                 לצפייה בסטטוס
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </span>

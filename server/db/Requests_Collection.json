@@ -42,8 +42,8 @@
 
     "files": {
       "studentId": "id1.pdf",
-      "fatherId": "",
-      "motherId": "",
+      "fatherId": "father1.pdf",
+      "motherId": "mother1.pdf",
       "studyApproval": "study1.pdf",
       "bankApproval": "bank1.pdf"
     }
@@ -89,8 +89,8 @@
 
     "files": {
       "studentId": "id2.pdf",
-      "fatherId": "",
-      "motherId": "",
+      "fatherId": "father1.pdf",
+      "motherId": "mother1.pdf",
       "studyApproval": "study2.pdf",
       "bankApproval": "bank2.pdf"
     }
