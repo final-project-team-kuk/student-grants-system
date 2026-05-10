@@ -1,6 +1,12 @@
+[
   {
     "_id": "77b111111111111111111111",
     "userId": "66a111111111111111111111",
+    "userSnapshot": {
+      "nationalId": "123456789",
+      "firstName": "Noa",
+      "lastName": "Levi"
+    },
     "status": "pending",
     "createdAt": "2026-04-28T10:00:00Z",
 
@@ -13,10 +19,10 @@
     },
 
     "family": {
-      "father": { "id": "111111111", "name": "David Levi" },
-      "mother": { "id": "222222222", "name": "Sara Levi" },
+      "father": { "id": "111111111", "firstName": "David", "lastName": "Levi" },
+      "mother": { "id": "222222222", "firstName": "Sara", "lastName": "Levi" },
       "siblings": [
-        { "id": "333333333", "name": "Yossi Levi" }
+        { "id": "333333333", "firstName": "Yossi", "lastName": "Levi", "birthDate": null }
       ]
     },
 
@@ -35,14 +41,21 @@
     },
 
     "files": {
-      "idDocs": ["id1.pdf"],
+      "studentId": "id1.pdf",
+      "fatherId": "",
+      "motherId": "",
       "studyApproval": "study1.pdf",
       "bankApproval": "bank1.pdf"
     }
-  }
+  },
   {
     "_id": "77b222222222222222222222",
     "userId": "66a222222222222222222222",
+    "userSnapshot": {
+      "nationalId": "987654321",
+      "firstName": "David",
+      "lastName": "Cohen"
+    },
     "status": "approved",
     "createdAt": "2026-04-27T09:00:00Z",
 
@@ -55,8 +68,8 @@
     },
 
     "family": {
-      "father": { "id": "444444444", "name": "Moshe Cohen" },
-      "mother": { "id": "555555555", "name": "Rivka Cohen" },
+      "father": { "id": "444444444", "firstName": "Moshe", "lastName": "Cohen" },
+      "mother": { "id": "555555555", "firstName": "Rivka", "lastName": "Cohen" },
       "siblings": []
     },
 
@@ -75,8 +88,11 @@
     },
 
     "files": {
-      "idDocs": ["id2.pdf"],
+      "studentId": "id2.pdf",
+      "fatherId": "",
+      "motherId": "",
       "studyApproval": "study2.pdf",
       "bankApproval": "bank2.pdf"
     }
   }
+]
