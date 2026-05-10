@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 export default function Dashboard({ setCurrentPage }) {
   return (
@@ -28,7 +29,7 @@ export default function Dashboard({ setCurrentPage }) {
               <h2 className="text-xl font-bold text-[#071325] mb-3">הגשת בקשה חדשה</h2>
               <p className="text-[#071325] text-sm mb-6 leading-relaxed">הגש בקשה למענק אקדמי. מלא את הפרטים האישיים, פרטי המשפחה, הלימודים והבנק.</p>
               <span className="text-[#071325] text-sm flex items-center gap-1">
-                להגשת בקשה
+               <NavLink to ="/form-step-two" className="text-[#071325] hover:text-[#1d4f8f] transition"> הגשת בקשה </NavLink>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </span>
             </div>
