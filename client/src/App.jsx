@@ -1,18 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import { MainComponent } from './components/MainComponent'
+﻿import React, { useState } from 'react';
+import './App.css';
+
+import { MainComponent } from './components/MainComponent';
+import Navbar from './components/NavBar.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import FromStepTwo from './components/FromStepTwo.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState('dashboard');
 
   return (
-    <>
-   <MainComponent></MainComponent>
-    </>
-  )
+    <div className="min-h-screen bg-[#f4f2ec] font-sans" dir="rtl">
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+
+      <main>
+        {currentPage === 'dashboard' && (
+          <Dashboard setCurrentPage={setCurrentPage} />
+        )}
+
+        {currentPage === 'form' && <FromStepTwo />}
+
+        {currentPage === 'main' && <MainComponent />}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
