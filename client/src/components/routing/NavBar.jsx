@@ -44,19 +44,8 @@ export default function Navbar() {
             }`
           }
         >
-          דף הבית
-        </NavLink>
-        <NavLink 
-          to="/form-step-two"
-          className={({ isActive }) => 
-            `transition px-4 py-1.5 rounded-full font-medium ${
-              isActive 
-                ? 'bg-[#1f4ea8]/20 text-[#E5DED0]' 
-                : 'text-[#cbd5ea] hover:text-white'
-            }`
-          }
-        >
-          טופס בקשה
+      
+    דף הבית
         </NavLink>
         <NavLink 
           to="/register"
