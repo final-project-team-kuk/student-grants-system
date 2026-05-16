@@ -69,30 +69,43 @@ export default function BankDetailsStep({ formData, handleChange }) {
               <h3 className="text-[#071325] text-sm font-medium mb-4 pb-2 border-b border-[#d5c9b5]">חשבון בנק לזיכוי</h3>
               
               <div className="grid md:grid-cols-2 gap-6">
-                {/* שם בעל החשבון */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-[#071325] mb-2 font-medium">שם בעל החשבון <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    name="accountHolder"
-                    placeholder="הזן שם מלא כפי שמופיע בבנק"
-                    className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325] transition text-sm text-[#071325] placeholder-[#071325]/40"
-                  />
-                </div>
+                {/* ת.ז בעל החשבון */}
+<div className="md:col-span-2">
+  <label className="block text-sm text-[#071325] mb-2 font-medium">ת.ז בעל החשבון <span className="text-red-500">*</span></label>
+  <input
+    type="text"
+    name="accountHolderId" // שינינו ל-ID כדי שיתאים לתעודת זהות (ודאי מול ה-Backend אם הם מעדיפים שם שדה אחר)
+    value={formData.accountHolderId || ''} 
+    onChange={handleChange}
+    placeholder="הזן מספר תעודת זהות (9 ספרות)"
+    maxLength={9} // מונע הקלדה של יותר מ-9 ספרות
+    className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325] transition text-sm text-[#071325] placeholder-[#071325]/40"
+  />
+</div>
 
-                {/* שם הבנק */}
-                <div>
-                  <label className="block text-sm text-[#071325] mb-2 font-medium">שם הבנק <span className="text-red-500">*</span></label>
-                  <input
-                   type="text"
-                   name="bankName" // חשוב! השם הזה חייב להיות זהה לשם בשדה ב-DB
-                   value={formData.bankName} // התיבה מציגה את מה שיש ב-formData
-                   onChange={handleChange} // כשמקלידים, הפונקציה מעדכנת את formData
-                   placeholder="הזן שם הבנק"
-                    className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325] transition text-sm text-[#071325] placeholder-[#071325]/40"
-                  />
-                </div>
-
+{/* שם הבנק - רשימה נפתחת */}
+<div>
+  <label className="block text-sm text-[#071325] mb-2 font-medium">שם הבנק <span className="text-red-500">*</span></label>
+  <select
+    name="bankName"
+    value={formData.bankName || ''} 
+    onChange={handleChange}
+    className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325] transition text-sm text-[#071325] appearance-none"
+  >
+    <option value="" disabled hidden>בחר בנק מהרשימה</option>
+    <option value="לאומי">בנק לאומי (10)</option>
+    <option value="הפועלים">בנק הפועלים (12)</option>
+    <option value="דיסקונט">בנק דיסקונט (11)</option>
+    <option value="מזרחי טפחות">בנק מזרחי טפחות (20)</option>
+    <option value="בינלאומי">הבנק הבינלאומי (31)</option>
+    <option value="יהב">בנק יהב (4) </option>
+    <option value="מרכנתיל">בנק מרכנתיל דיסקונט (17)</option>
+    <option value="מסד">בנק מסד (46)</option>
+    <option value="פאגא">בנק פועלי אגודת ישראל (52)</option>
+    <option value="ירושלים">בנק ירושלים (54)</option>
+    <option value="וואן זירו">וואן זירו בנק דיגיטלי (18)</option>
+  </select>
+</div>
                 {/* מספר סניף */}
                 <div>
                   <label className="block text-sm text-[#071325] mb-2 font-medium">מספר סניף <span className="text-red-500">*</span></label>
