@@ -1,0 +1,98 @@
+[
+  {
+    "_id": "77b111111111111111111111",
+    "userId": "66a111111111111111111111",
+    "userSnapshot": {
+      "nationalId": "123456789",
+      "firstName": "Noa",
+      "lastName": "Levi"
+    },
+    "status": "approved",
+    "createdAt": "2026-04-28T10:00:00Z",
+
+    "personal": {
+      "birthDate": "2000-05-10",
+      "city": "Jerusalem",
+      "address": "Herzl 10",
+      "phone": "02-1234567",
+      "mobile": "0501234567"
+    },
+
+    "family": {
+      "father": { "id": "111111111", "firstName": "David", "lastName": "Levi" },
+      "mother": { "id": "222222222", "firstName": "Sara", "lastName": "Levi" },
+      "siblings": [
+        { "id": "333333333", "firstName": "Yossi", "lastName": "Levi", "birthDate": null }
+      ]
+    },
+
+    "education": {
+      "institution": "Hebrew University",
+      "field": "Computer Science",
+      "years": 3,
+      "tuition": 12000
+    },
+
+    "bank": {
+      "bankName": "Hapoalim",
+      "branch": "123",
+      "accountNumber": "456789",
+      "ownerId": "123456789"
+    },
+
+    "files": {
+      "studentId": "id1.pdf",
+      "fatherId": "father1.pdf",
+      "motherId": "mother1.pdf",
+      "studyApproval": "study1.pdf",
+      "bankApproval": "bank1.pdf"
+    }
+  },
+  {
+    "_id": "77b222222222222222222222",
+    "userId": "66a222222222222222222222",
+    "userSnapshot": {
+      "nationalId": "987654321",
+      "firstName": "David",
+      "lastName": "Cohen"
+    },
+    "status": "approved",
+    "createdAt": "2026-04-27T09:00:00Z",
+
+    "personal": {
+      "birthDate": "1999-02-15",
+      "city": "Tel Aviv",
+      "address": "Rothschild 5",
+      "phone": "03-1111111",
+      "mobile": "0509999999"
+    },
+
+    "family": {
+      "father": { "id": "444444444", "firstName": "Moshe", "lastName": "Cohen" },
+      "mother": { "id": "555555555", "firstName": "Rivka", "lastName": "Cohen" },
+      "siblings": []
+    },
+
+    "education": {
+      "institution": "TAU",
+      "field": "Engineering",
+      "years": 4,
+      "tuition": 14000
+    },
+
+    "bank": {
+      "bankName": "Leumi",
+      "branch": "321",
+      "accountNumber": "987654",
+      "ownerId": "987654321"
+    },
+
+    "files": {
+      "studentId": "id2.pdf",
+      "fatherId": "father1.pdf",
+      "motherId": "mother1.pdf",
+      "studyApproval": "study2.pdf",
+      "bankApproval": "bank2.pdf"
+    }
+  }
+]
