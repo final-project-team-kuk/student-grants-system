@@ -1,10 +1,4 @@
-// ============================================================
-//  client/src/components/Login.jsx
-//  עמוד כניסה/הרשמה — ללא לוגיקת בדיקות תקינות
-// ============================================================
 import { useState } from "react";
-import validateRegisterForm from "../../../server/middleware/registerValidation";
-import validateLoginForm    from "../../../server/middleware/loginValidation";
 
 const gradCap = (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
@@ -12,231 +6,77 @@ const gradCap = (
   </svg>
 );
 
-export function Login({ onSwitchToLogin }) {
+export default function Register({ onSwitchToLogin }) {
   const [activeTab, setActiveTab] = useState("register");
   const [form, setForm] = useState({
-    firstName:       "",
-    lastName:        "",
-    idNumber:        "",
-    email:           "",
-    password:        "",
+    firstName: "",
+    lastName: "",
+    idNumber: "",
+    password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors]       = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (field) => (e) => {
+  const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    // מנקה את השגיאה של השדה ברגע שהמשתמש מתחיל להקליד
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
 
-  const handleTabSwitch = (tab) => {
-    setActiveTab(tab);
-    setErrors({});
-    if (tab === "login") onSwitchToLogin?.();
-  };
+const handleSubmit = async () => {
+  setIsLoading(true);
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
 
-  const handleSubmit = async () => {
-    // ── בדיקות צד לקוח ──────────────────────────────────────
-    const { errors: validationErrors, isValid } =
-      activeTab === "register"
-        ? validateRegisterForm(form)
-        : validateLoginForm(form);
-
-    if (!isValid) {
-      setErrors(validationErrors);
-      return;
+    if (response.ok) {
+      alert("נרשמת בהצלחה!");
+      onSwitchToLogin();
     }
+  } catch (error) {
+    console.error("שגיאה ברישום:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    setIsLoading(true);
-    try {
-      if (activeTab === "register") {
-        const response = await fetch("http://localhost:5000/api/auth/register", {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstName: form.firstName.trim(),
-            lastName:  form.lastName.trim(),
-            idNumber:  form.idNumber.trim(),
-            email:     form.email.trim().toLowerCase(),
-            password:  form.password,
-          }),
-        });
-
-        if (response.ok) {
-          alert("נרשמת בהצלחה!");
-          setForm({ firstName: "", lastName: "", idNumber: "", email: "", password: "", confirmPassword: "" });
-          setErrors({});
-          handleTabSwitch("login");
-        } else {
-          const data = await response.json();
-          if (data.field) {
-            setErrors({ [data.field]: data.error });
-          } else {
-            alert(data.error || "שגיאה ברישום");
-          }
-        }
-      } else {
-        const response = await fetch("http://localhost:5000/api/auth/login", {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            idNumber: form.idNumber.trim(),
-            password: form.password,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          alert("התחברת בהצלחה!");
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-          setForm({ firstName: "", lastName: "", idNumber: "", email: "", password: "", confirmPassword: "" });
-          setErrors({});
-        } else {
-          const data = await response.json();
-          if (data.field) {
-            setErrors({ [data.field]: data.error });
-          } else {
-            alert(data.error || "שגיאה בהתחברות");
-          }
-        }
-      }
-    } catch (err) {
-      console.error("שגיאה:", err);
-      alert("שגיאה בשרת");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fields =
-    activeTab === "register"
-      ? [
-          { key: "firstName",       label: "שם פרטי",      placeholder: "הזן שם פרטי",    type: "text"     },
-          { key: "lastName",        label: "שם משפחה",     placeholder: "הזן שם משפחה",   type: "text"     },
-          { key: "idNumber",        label: "מספר זהות",    placeholder: "הזן מספר זהות",  type: "text"     },
-          { key: "email",           label: "אימייל",       placeholder: "הזן אימייל",     type: "email"    },
-          { key: "password",        label: "סיסמה",        placeholder: "בחר סיסמה",      type: "password" },
-          { key: "confirmPassword", label: "אימות סיסמה",  placeholder: "הזן סיסמה שוב",  type: "password" },
-        ]
-      : [
-          { key: "idNumber", label: "מספר זהות", placeholder: "הזן מספר זהות", type: "text"     },
-          { key: "password", label: "סיסמה",     placeholder: "הזן סיסמה",     type: "password" },
-        ];
+  const fields = [
+    { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
+    { key: "lastName",        label: "שם משפחה",      placeholder: "הזן שם משפחה",     type: "text"     },
+    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
+    { key: "password",        label: "סיסמה",         placeholder: "בחר סיסמה",        type: "password" },
+    { key: "confirmPassword", label: "אימות סיסמה",   placeholder: "הזן סיסמה שוב",   type: "password" },
+  ];
 
   return (
-    <div
-      dir="rtl"
-      className="min-h-screen bg-[#F2EDE4] flex items-center justify-center overflow-hidden"
-      style={{ fontFamily: "'Heebo', sans-serif", padding: "40px 16px", position: "static" }}
-    >
-      {/* Blob 1 */}
-      <div
-        style={{
-          position:     "fixed",
-          width:        580,
-          height:       580,
-          borderRadius: "50%",
-          background:   "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
-          top:          "-120px",
-          left:         "-100px",
-          filter:       "blur(80px)",
-          animation:    "blobFloat 8s ease-in-out infinite",
-          pointerEvents: "none",
-        }}
-      />
-      {/* Blob 2 */}
-      <div
-        style={{
-          position:     "fixed",
-          width:        450,
-          height:       450,
-          borderRadius: "50%",
-          background:   "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
-          bottom:       "-80px",
-          right:        "-60px",
-          filter:       "blur(70px)",
-          animation:    "blobFloat 10s ease-in-out infinite reverse",
-          pointerEvents: "none",
-        }}
-      />
+    <div style={styles.root}>
+      {/* כתמים בולטים יותר ברקע */}
+      <div style={styles.blob1} />
+      <div style={styles.blob2} />
 
-      {/* Container */}
-      <div
-        className="flex flex-col items-center w-full max-w-[480px]"
-        style={{ gap: "16px", zIndex: 1, animation: "fadeUp 0.7s ease both" }}
-      >
+      <div style={styles.container}>
         {/* Logo */}
-        <div style={{ marginBottom: 4 }}>
-          <div
-            className="flex items-center justify-center bg-[#0A192F]"
-            style={{ width: 68, height: 68, borderRadius: 18, boxShadow: "0 8px 32px rgba(10,25,47,0.25)" }}
-          >
-            {gradCap}
-          </div>
+        <div style={styles.logoWrap}>
+          <div style={styles.logoIcon}>{gradCap}</div>
         </div>
 
         {/* Title */}
-        <h1
-          className="text-center"
-          style={{ color: "#0A192F", fontSize: 26, fontWeight: 800, letterSpacing: "-0.3px" }}
-        >
-          מערכת מענקים לסטודנטים
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-center" style={{ color: "#5C6370", fontSize: 14, fontWeight: 300, marginTop: -8 }}>
-          ניהול בקשות מענק אקדמי
-        </p>
+        <h1 style={styles.title}>מערכת מענקים לסטודנטים</h1>
+        <p style={styles.subtitle}>ניהול בקשות מענק אקדמי</p>
 
         {/* Card */}
-        <div
-          className="w-full flex flex-col"
-          style={{
-            marginTop:           8,
-            background:          "rgba(255, 255, 255, 0.7)",
-            backdropFilter:      "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            border:              "1px solid rgba(10,25,47,0.1)",
-            borderRadius:        20,
-            padding:             "28px 28px 24px",
-            gap:                 18,
-            boxShadow:           "0 24px 60px rgba(0,0,0,0.08)",
-          }}
-        >
+        <div style={styles.card}>
           {/* Tabs */}
-          <div className="flex" style={{ borderRadius: 12, background: "#E5E0D5", padding: 4, gap: 4 }}>
+          <div style={styles.tabRow}>
             <button
-              className="flex-1 border-none cursor-pointer transition-all duration-[220ms]"
-              style={{
-                padding:    "10px 0",
-                borderRadius: 9,
-                fontSize:   15,
-                fontFamily: "'Heebo', sans-serif",
-                fontWeight: 600,
-                background: activeTab === "register" ? "#0A192F" : "transparent",
-                color:      activeTab === "register" ? "#F5F1E9" : "#5C6370",
-                boxShadow:  activeTab === "register" ? "0 4px 14px rgba(10,25,47,0.2)" : "none",
-              }}
-              onClick={() => handleTabSwitch("register")}
+              style={{ ...styles.tab, ...(activeTab === "register" ? styles.tabActive : styles.tabInactive) }}
+              onClick={() => setActiveTab("register")}
             >
               הרשמה
             </button>
             <button
-              className="flex-1 border-none cursor-pointer transition-all duration-[220ms]"
-              style={{
-                padding:    "10px 0",
-                borderRadius: 9,
-                fontSize:   15,
-                fontFamily: "'Heebo', sans-serif",
-                fontWeight: 600,
-                background: activeTab === "login" ? "#0A192F" : "transparent",
-                color:      activeTab === "login" ? "#F5F1E9" : "#5C6370",
-                boxShadow:  activeTab === "login" ? "0 4px 14px rgba(10,25,47,0.2)" : "none",
-              }}
-              onClick={() => handleTabSwitch("login")}
+              style={{ ...styles.tab, ...(activeTab === "login" ? styles.tabActive : styles.tabInactive) }}
+              onClick={() => { setActiveTab("login"); onSwitchToLogin?.(); }}
             >
               כניסה למערכת
             </button>
@@ -244,88 +84,32 @@ export function Login({ onSwitchToLogin }) {
 
           {/* Fields */}
           {fields.map(({ key, label, placeholder, type }) => (
-            <div key={key} className="flex flex-col" style={{ gap: 7 }}>
-              <label style={{ color: "#0A192F", fontSize: 14, fontWeight: 500, textAlign: "right" }}>
-                {label}
-              </label>
+            <div key={key} style={styles.fieldGroup}>
+              <label style={styles.label}>{label}</label>
               <input
-                className="w-full focus:outline-none"
-                style={{
-                  background:   "#ffffff",
-                  border:       `1px solid ${errors[key] ? "#E53E3E" : "#D1D5DB"}`,
-                  borderRadius: 12,
-                  padding:      "13px 18px",
-                  color:        "#0A192F",
-                  fontSize:     15,
-                  fontFamily:   "'Heebo', sans-serif",
-                  textAlign:    "right",
-                  transition:   "border-color 0.2s, box-shadow 0.2s",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = errors[key] ? "#E53E3E" : "#0A192F";
-                  e.target.style.boxShadow   = errors[key]
-                    ? "0 0 0 3px rgba(229,62,62,0.15)"
-                    : "0 0 0 3px rgba(10,25,47,0.15)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = errors[key] ? "#E53E3E" : "#D1D5DB";
-                  e.target.style.boxShadow   = "none";
-                }}
+                style={styles.input}
                 type={type}
                 value={form[key]}
                 onChange={handleChange(key)}
                 placeholder={placeholder}
                 dir="rtl"
               />
-              {/* הודעת שגיאה מתחת לשדה */}
-              {errors[key] && (
-                <span style={{ color: "#E53E3E", fontSize: 12, textAlign: "right", marginTop: 2 }}>
-                  {errors[key]}
-                </span>
-              )}
             </div>
           ))}
 
           {/* Submit */}
           <button
-            style={{
-              width:         "100%",
-              padding:       "15px",
-              borderRadius:  12,
-              border:        "none",
-              background:    "#0A192F",
-              color:         "#F5F1E9",
-              fontSize:      16,
-              fontWeight:    700,
-              fontFamily:    "'Heebo', sans-serif",
-              cursor:        isLoading ? "not-allowed" : "pointer",
-              letterSpacing: "0.3px",
-              boxShadow:     "0 6px 24px rgba(10,25,47,0.2)",
-              marginTop:     4,
-              opacity:       isLoading ? 0.7 : 1,
-              transition:    "opacity 0.2s, transform 0.15s",
-            }}
+            style={{ ...styles.submitBtn, ...(isLoading ? styles.submitBtnLoading : {}) }}
             onClick={handleSubmit}
             disabled={isLoading}
           >
-            {isLoading
-              ? activeTab === "register" ? "יוצר חשבון..." : "מתחבר..."
-              : activeTab === "register" ? "יצירת חשבון"  : "כניסה"}
+            {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
           </button>
 
           {/* Footer */}
-          <p style={{ color: "#5C6370", fontSize: 13, textAlign: "center", marginTop: -4 }}>
+          <p style={styles.footerText}>
             כבר יש לך חשבון?{" "}
-            <span
-              style={{
-                color:               "#0A192F",
-                cursor:              "pointer",
-                fontWeight:          600,
-                textDecoration:      "underline",
-                textUnderlineOffset: 2,
-              }}
-              onClick={() => handleTabSwitch("login")}
-            >
+            <span style={styles.footerLink} onClick={() => onSwitchToLogin?.()}>
               כניסה למערכת
             </span>
           </p>
@@ -336,6 +120,7 @@ export function Login({ onSwitchToLogin }) {
         @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input::placeholder { color: #A0AEC0; }
+        input:focus { outline: none; border-color: #0A192F !important; box-shadow: 0 0 0 3px rgba(10,25,47,0.15); }
         button { transition: opacity 0.2s, transform 0.15s; }
         button:hover:not(:disabled) { opacity: 0.92; }
         @keyframes fadeUp {
@@ -350,3 +135,173 @@ export function Login({ onSwitchToLogin }) {
     </div>
   );
 }
+
+const styles = {
+  root: {
+    minHeight: "100vh",
+    background: "#F2EDE4",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "'Heebo', sans-serif",
+    direction: "rtl",
+    position: "relative",
+    overflow: "hidden",
+    padding: "40px 16px",
+  },
+  blob1: {
+    position: "fixed",
+    width: 580,
+    height: 580,
+    borderRadius: "50%",
+    background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
+    top: "-120px",
+    left: "-100px",
+    filter: "blur(80px)",
+    animation: "blobFloat 8s ease-in-out infinite",
+    pointerEvents: "none",
+  },
+  blob2: {
+    position: "fixed",
+    width: 450,
+    height: 450,
+    borderRadius: "50%",
+    background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
+    bottom: "-80px",
+    right: "-60px",
+    filter: "blur(70px)",
+    animation: "blobFloat 10s ease-in-out infinite reverse",
+    pointerEvents: "none",
+  },
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "16px",
+    animation: "fadeUp 0.7s ease both",
+    zIndex: 1,
+    width: "100%",
+    maxWidth: 480,
+  },
+  logoWrap: { marginBottom: 4 },
+  logoIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 18,
+    background: "#0A192F",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 8px 32px rgba(10,25,47,0.25)",
+  },
+  title: {
+    color: "#0A192F",
+    fontSize: 26,
+    fontWeight: 800,
+    letterSpacing: "-0.3px",
+    textAlign: "center",
+  },
+  subtitle: {
+    color: "#5C6370",
+    fontSize: 14,
+    fontWeight: 300,
+    textAlign: "center",
+    marginTop: -8,
+  },
+  card: {
+    marginTop: 8,
+    width: "100%",
+    background: "rgba(255, 255, 255, 0.7)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)",
+    border: "1px solid rgba(10,25,47,0.1)",
+    borderRadius: 20,
+    padding: "28px 28px 24px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 18,
+    boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
+  },
+  tabRow: {
+    display: "flex",
+    borderRadius: 12,
+    background: "#E5E0D5",
+    padding: 4,
+    gap: 4,
+  },
+  tab: {
+    flex: 1,
+    padding: "10px 0",
+    borderRadius: 9,
+    border: "none",
+    cursor: "pointer",
+    fontSize: 15,
+    fontFamily: "'Heebo', sans-serif",
+    fontWeight: 600,
+    transition: "all 0.22s ease",
+  },
+  tabActive: {
+    background: "#0A192F",
+    color: "#F5F1E9",
+    boxShadow: "0 4px 14px rgba(10,25,47,0.2)",
+  },
+  tabInactive: {
+    background: "transparent",
+    color: "#5C6370",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 7,
+  },
+  label: {
+    color: "#0A192F",
+    fontSize: 14,
+    fontWeight: 500,
+    textAlign: "right",
+  },
+  input: {
+    background: "#ffffff",
+    border: "1px solid #D1D5DB",
+    borderRadius: 12,
+    padding: "13px 18px",
+    color: "#0A192F",
+    fontSize: 15,
+    fontFamily: "'Heebo', sans-serif",
+    textAlign: "right",
+    width: "100%",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  },
+  submitBtn: {
+    width: "100%",
+    padding: "15px",
+    borderRadius: 12,
+    border: "none",
+    background: "#0A192F",
+    color: "#F5F1E9",
+    fontSize: 16,
+    fontWeight: 700,
+    fontFamily: "'Heebo', sans-serif",
+    cursor: "pointer",
+    letterSpacing: "0.3px",
+    boxShadow: "0 6px 24px rgba(10,25,47,0.2)",
+    marginTop: 4,
+  },
+  submitBtnLoading: {
+    opacity: 0.7,
+    cursor: "not-allowed",
+  },
+  footerText: {
+    color: "#5C6370",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: -4,
+  },
+  footerLink: {
+    color: "#0A192F",
+    cursor: "pointer",
+    fontWeight: 600,
+    textDecoration: "underline",
+    textUnderlineOffset: 2,
+  },
+};
