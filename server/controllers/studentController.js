@@ -32,8 +32,8 @@ const register = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({ message: 'ID number already exists' });
     }
-
-    res.status(400).json({ message: error.message });
+    // לא שינינו כאן הרבה, כי register לא מקבל ID חיצוני, אז אין סכנת CastError
+    res.status(400).json({ message: 'אירעה שגיאה ביצירת המשתמש.' }); 
   }
 };
 
@@ -42,7 +42,8 @@ const getAllStudents = async (req, res) => {
     const students = await Student.find().select('-password');
     res.json(students);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Database Error:", error.message);
+    res.status(500).json({ message: 'אירעה תקלה פנימית במערכת.' });
   }
 };
 
@@ -52,12 +53,17 @@ const getStudentById = async (req, res) => {
     const student = await Student.findById(id).select('-password');
 
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: 'המשתמש לא נמצא.' });
     }
 
     res.json(student);
   } catch (error) {
-    res.status(400).json({ message: 'Invalid student ID' });
+    // === התיקון ===
+    if (error.name === 'CastError') {
+       return res.status(400).json({ message: 'מזהה המשתמש אינו תקין. ייתכן והתהליך הופסק באמצע.' });
+    }
+    console.error("Database Error:", error.message);
+    res.status(500).json({ message: 'אירעה תקלה במשיכת פרטי המשתמש.' });
   }
 };
 
@@ -68,7 +74,7 @@ const updateStudent = async (req, res) => {
 
     const student = await Student.findById(id).select('+password');
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: 'המשתמש לא נמצא במערכת.' });
     }
 
     if (firstName !== undefined) student.firstName = firstName;
@@ -86,9 +92,16 @@ const updateStudent = async (req, res) => {
     res.json(updatedStudent);
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(409).json({ message: 'ID number already exists' });
+      return res.status(409).json({ message: 'ID number already exists' }); // את זה השארנו באנגלית כדי שה-React יזהה אותו
     }
-    res.status(400).json({ message: error.message });
+    
+    // === התיקון המרכזי ===
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'מזהה המשתמש אינו תקין. אנא ודא שהתחלת את התהליך מההתחלה כראוי.' });
+    }
+
+    console.error("Database Error in Update:", error.message);
+    res.status(500).json({ message: 'אירעה תקלה בעת ניסיון שמירת הנתונים.' });
   }
 };
 
@@ -98,12 +111,17 @@ const deleteStudent = async (req, res) => {
     const student = await Student.findByIdAndDelete(id);
 
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: 'המשתמש לא נמצא.' });
     }
 
     res.json({ message: 'Student deleted successfully' });
   } catch (error) {
-    res.status(400).json({ message: 'Invalid student ID' });
+    // === התיקון ===
+    if (error.name === 'CastError') {
+        return res.status(400).json({ message: 'מזהה המשתמש אינו תקין לפעולת המחיקה.' });
+    }
+    console.error("Database Error in Delete:", error.message);
+    res.status(500).json({ message: 'אירעה תקלה בעת מחיקת המשתמש.' });
   }
 };
 

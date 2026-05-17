@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
+// התיקון: שינינו ל-require והתאמנו את שם הקובץ המדויק!
+const requestRoutes = require('./routes/requestRouters.js');
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +14,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', studentRoutes);
+app.use('/api/requests', requestRoutes); // הצינור המרכזי של הבקשות שלך מחובר!
 
 // Basic Route
 app.get('/', (req, res) => {
