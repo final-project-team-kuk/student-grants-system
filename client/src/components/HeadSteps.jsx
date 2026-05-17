@@ -1,31 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import FromStepTwo from './FromStepTwo';
+import Step3Studies from './Step3Studies';
 
-// ייבוא הקומפוננטות. ודאי שיש לך קבצים עבור השלבים האחרים שאינם בהערה
-// import FromStepOne from './FromStepOne'; 
-import FromStepTwo from './FromStepTwo'; 
-//import FromStepOne from './FromStepOne';
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = Number(searchParams.get('step')) || 1;
+  const [requestId, setRequestId] = useState(null);
 
-  // הפונקציות שאנחנו מעבירים פנימה כדי לאפשר לכפתורים לעבוד
   const goToNextStep = () => setSearchParams({ step: currentStep + 1 });
   const goToPrevStep = () => setSearchParams({ step: currentStep - 1 });
 
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        // כאן יש לרנדר את קומפוננטת שלב 1 ברגע שתיצרי אותה
-        // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-      //   return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-      //  case 1:
-      //   // התיקון: מעבירים את currentStep לתוך השלב כדי שהסרגל יעבוד דינמית
-        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
-        // return <FromStepThree nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
-  //    default:
-        // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-       // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
+        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} setRequestId={setRequestId} />;
+      case 3:
+        return <Step3Studies nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} requestId={requestId} />;
+      default:
+        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} setRequestId={setRequestId} />;
     }
   };
 
