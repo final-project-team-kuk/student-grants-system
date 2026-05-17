@@ -1,8 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-
+import Step3Studies from './Step3Studies';
 // ייבוא הקומפוננטות. ודאי שיש לך קבצים עבור השלבים האחרים שאינם בהערה
-// import FromStepOne from './FromStepOne'; 
 import FromStepTwo from './FromStepTwo'; 
 //import FromStepOne from './FromStepOne';
 export default function HeaderSteps() {
@@ -21,8 +20,9 @@ export default function HeaderSteps() {
       //   return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
       //  case 1:
       //   // התיקון: מעבירים את currentStep לתוך השלב כדי שהסרגל יעבוד דינמית
-        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
-        // return <FromStepThree nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
+        // return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
+
+        return <Step3Studies nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
   //    default:
         // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
        // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
