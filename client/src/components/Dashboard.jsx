@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // 1. מייבאים את הכלי החדש של ריאקט
+import HeadSteps from './HeadSteps'; // 2. מייבאים את המעטפת של הטופס שלנו
 
 export default function Dashboard() {
   const navigate = useNavigate(); // 2. יוצרים את ה"מנווט" שלנו
@@ -16,7 +17,7 @@ export default function Dashboard() {
           {/* כפתור הגשת בקשה */}
           <button
             type="button"
-            onClick={() => navigate('/from-step-two')} // 3. בלחיצה על הכפתור -> נווט לטופס!
+            onClick={() => navigate('/HeadSteps')} // 3. בלחיצה על הכפתור -> נווט לטופס!
             className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full"
           >
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
