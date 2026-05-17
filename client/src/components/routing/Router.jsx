@@ -4,6 +4,7 @@ import Dashboard from "../Dashboard"
 import Login from "../Login"
 import Register from "../Register"
 import AdminRequests from "../admin-requests.jsx"
+import AdminRequestDetails from "../AdminRequestDetails"
 import Navbar from "./NavBar"
 
 // 1. מחקנו את הייבוא הישיר של FromStepTwo
@@ -19,6 +20,7 @@ export const Router = () => {
                     <Route path="/" element={<MainComponent />} />
                  <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/admin-requests" element={<AdminRequests />} />
+                    <Route path="/admin-request-details/:id" element={<AdminRequestDetails />} />
                     
                     {/* 3. שינינו את הנתיב כך שיפעיל את המעטפת */}
                     <Route path="/HeadSteps" element={<HeadSteps />} />
