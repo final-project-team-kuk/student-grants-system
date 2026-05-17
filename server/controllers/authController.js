@@ -1,9 +1,9 @@
-import User from "../models/User.js"; // ייבוא המודל של המשתמש
-import bcrypt from "bcryptjs"; // ספריה להצפנת סיסמאות
-import jwt from "jsonwebtoken"; // ליצירת טוקן אבטחה
+const User = require("../models/User.js"); // ייבוא המודל של המשתמש
+const bcrypt = require("bcryptjs"); // ספריה להצפנת סיסמאות
+const jwt = require("jsonwebtoken"); // ליצירת טוקן אבטחה
 
 // הרשמה
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { firstName, lastName, idNumber, password, email } = req.body;
 
@@ -34,7 +34,7 @@ export const register = async (req, res) => {
 };
 
 // התחברות
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { idNumber, password } = req.body;
 
@@ -62,3 +62,5 @@ export const login = async (req, res) => {
     res.status(500).json({ error: "שגיאה בשרת בעת הניסיון להתחבר" });
   }
 };
+
+module.exports = { register, login };
