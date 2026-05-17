@@ -1,3 +1,4 @@
+[
   {
     "_id": "66a111111111111111111111",
     "nationalId": "123456789",
@@ -5,7 +6,7 @@
     "lastName": "Levi",
     "password": "1234",
     "role": "user"
-  }
+  },
   {
     "_id": "66a222222222222222222222",
     "nationalId": "987654321",
@@ -13,7 +14,7 @@
     "lastName": "Cohen",
     "password": "1234",
     "role": "user"
-  }
+  },
   {
     "_id": "66a333333333333333333333",
     "nationalId": "555555555",
@@ -22,3 +23,4 @@
     "password": "admin123",
     "role": "admin"
   }
+]
