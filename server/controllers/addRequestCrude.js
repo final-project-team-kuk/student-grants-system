@@ -5,6 +5,7 @@ const requestModel = require("../models/requestModel");
 // Gets the full request body and saves it as a new document in MongoDB.
 const create = (req, res) => {
   const new_request = new requestModel(req.body);
+
   new_request.save()
     .then(request => {
       return res.status(201).send(request);
@@ -17,7 +18,6 @@ const create = (req, res) => {
 // ─── READ ALL ─────────────────────────────────────────────────────────────────
 // GET /api/requests
 // Returns every request in the database.
-// Optional query filters: ?status=pending  /  ?userId=<id>
 const read = (req, res) => {
   requestModel.find()
     .then(requests => res.status(200).send(requests))
@@ -26,13 +26,20 @@ const read = (req, res) => {
 
 // ─── READ ONE ─────────────────────────────────────────────────────────────────
 // GET /api/requests/:id
-// Returns a single request that matches the given MongoDB _id.
+// Returns a single request that matches the given nationalId.
 const readOne = (req, res) => {
-  requestModel.findById(req.params.id)
+
+  console.log(req.params.id);
+  console.log(typeof req.params.id);
+
+  requestModel.findOne({
+    "userSnapshot.nationalId": String(req.params.id).trim()
+  })
     .then(request => {
       if (!request) {
         return res.status(404).send({ error: "Request not found" });
       }
+
       return res.status(200).send(request);
     })
     .catch(error => {
@@ -42,11 +49,15 @@ const readOne = (req, res) => {
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────────
 // PUT /api/requests/:id
-// Updates only the fields you send in the body — everything else stays the same.
-// runValidators makes sure the new values still pass the schema rules.
 const update = (req, res) => {
-  requestModel.findByIdAndUpdate(
-    req.params.id,
+
+  console.log(req.params.id);
+  console.log(typeof req.params.id);
+
+  requestModel.findOneAndUpdate(
+    {
+      "userSnapshot.nationalId": String(req.params.id).trim()
+    },
     { $set: req.body },
     { new: true, runValidators: true }
   )
@@ -54,6 +65,7 @@ const update = (req, res) => {
       if (!request) {
         return res.status(404).send({ error: "Request not found" });
       }
+
       return res.status(200).send(request);
     })
     .catch(error => {
@@ -63,15 +75,21 @@ const update = (req, res) => {
 
 // ─── UPDATE STATUS ────────────────────────────────────────────────────────────
 // PATCH /api/requests/:id/status
-// Changes only the status field.  Body must be: { "status": "approved" }
 const updateStatus = (req, res) => {
+
   const { status } = req.body;
+
   if (!["pending", "approved", "rejected"].includes(status)) {
     return res.status(400).send({ error: "Invalid status value" });
   }
 
-  requestModel.findByIdAndUpdate(
-    req.params.id,
+  console.log(req.params.id);
+  console.log(typeof req.params.id);
+
+  requestModel.findOneAndUpdate(
+    {
+      "userSnapshot.nationalId": String(req.params.id).trim()
+    },
     { $set: { status } },
     { new: true }
   )
@@ -79,6 +97,7 @@ const updateStatus = (req, res) => {
       if (!request) {
         return res.status(404).send({ error: "Request not found" });
       }
+
       return res.status(200).send(request);
     })
     .catch(error => {
@@ -88,18 +107,33 @@ const updateStatus = (req, res) => {
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
 // DELETE /api/requests/:id
-// Permanently removes the request from the database.
 const remove = (req, res) => {
-  requestModel.findByIdAndDelete(req.params.id)
+
+  console.log(req.params.id);
+  console.log(typeof req.params.id);
+
+  requestModel.findOneAndDelete({
+    "userSnapshot.nationalId": String(req.params.id).trim()
+  })
     .then(request => {
       if (!request) {
         return res.status(404).send({ error: "Request not found" });
       }
-      return res.status(200).send({ message: "Request deleted successfully" });
+
+      return res.status(200).send({
+        message: "Request deleted successfully"
+      });
     })
     .catch(error => {
       return res.status(500).send({ error: error.message });
     });
 };
 
-module.exports = { create, read, readOne, update, updateStatus, remove };
+module.exports = {
+  create,
+  read,
+  readOne,
+  update,
+  updateStatus,
+  remove
+};
