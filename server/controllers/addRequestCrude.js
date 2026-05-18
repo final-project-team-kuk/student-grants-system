@@ -1,9 +1,9 @@
-import requestModel from "../models/requestModel.js";
+const requestModel = require("../models/requestModel");
 
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 // POST /api/requests
 // Gets the full request body and saves it as a new document in MongoDB.
-export const create = (req, res) => {
+const create = (req, res) => {
   const new_request = new requestModel(req.body);
   new_request.save()
     .then(request => {
@@ -18,7 +18,7 @@ export const create = (req, res) => {
 // GET /api/requests
 // Returns every request in the database.
 // Optional query filters: ?status=pending  /  ?userId=<id>
-export const read = (req, res) => {
+const read = (req, res) => {
   requestModel.find()
     .then(requests => res.status(200).send(requests))
     .catch(error => res.status(500).send({ error: error.message }));
@@ -27,7 +27,7 @@ export const read = (req, res) => {
 // ─── READ ONE ─────────────────────────────────────────────────────────────────
 // GET /api/requests/:id
 // Returns a single request that matches the given MongoDB _id.
-export const readOne = (req, res) => {
+const readOne = (req, res) => {
   requestModel.findById(req.params.id)
     .then(request => {
       if (!request) {
@@ -44,7 +44,7 @@ export const readOne = (req, res) => {
 // PUT /api/requests/:id
 // Updates only the fields you send in the body — everything else stays the same.
 // runValidators makes sure the new values still pass the schema rules.
-export const update = (req, res) => {
+const update = (req, res) => {
   requestModel.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
@@ -64,7 +64,7 @@ export const update = (req, res) => {
 // ─── UPDATE STATUS ────────────────────────────────────────────────────────────
 // PATCH /api/requests/:id/status
 // Changes only the status field.  Body must be: { "status": "approved" }
-export const updateStatus = (req, res) => {
+const updateStatus = (req, res) => {
   const { status } = req.body;
   if (!["pending", "approved", "rejected"].includes(status)) {
     return res.status(400).send({ error: "Invalid status value" });
@@ -89,7 +89,7 @@ export const updateStatus = (req, res) => {
 // ─── DELETE ───────────────────────────────────────────────────────────────────
 // DELETE /api/requests/:id
 // Permanently removes the request from the database.
-export const remove = (req, res) => {
+const remove = (req, res) => {
   requestModel.findByIdAndDelete(req.params.id)
     .then(request => {
       if (!request) {
@@ -101,3 +101,5 @@ export const remove = (req, res) => {
       return res.status(500).send({ error: error.message });
     });
 };
+
+module.exports = { create, read, readOne, update, updateStatus, remove };
