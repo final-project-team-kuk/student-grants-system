@@ -1,41 +1,56 @@
+const Request = require('../db/Request');
+const mongoose = require('mongoose');
 
-import Request from "../db/Request.js"; // ייבוא הסכימה המעולה שמצאנו קודם
+const formatRequestResponse = (request) => ({
+  status: request.status,
+  createdAt: request.createdAt,
+  education: request.education,
+  userSnapshot: request.userSnapshot,
+});
 
-// פונקציה לעדכון פרטי המשפחה (שלב 2)
-export const updateFamilyStep = async (req, res) => {
+// פונקציית עזר לשליפת הבקשה מהמסד כדי למנוע כפילות קוד
+const fetchLatestRequestForUser = async (userId) => {
+  const objectId = new mongoose.Types.ObjectId(userId);
+  return await Request.findOne({ userId: objectId }).sort({ createdAt: -1 });
+};
+
+const getRequestStatus = async (req, res) => {
   try {
-    // 1. נשלוף את ה-ID של הבקשה מה-URL (למשל: /api/requests/77b1111...)
-    const { requestId } = req.params; 
-    
-    // 2. המידע שמגיע מה-React (ה-Payload שעיצבנו)
-    const { family } = req.body; 
+    const { userId } = req.params;
+    const request = await fetchLatestRequestForUser(userId);
 
-    // בדיקה בסיסית: ודאות שהנתונים הגיעו
-    if (!family || !family.father || !family.father.id) {
-      return res.status(400).json({ error: "נתוני פרטי אב חסרים או לא מלאים" });
+    if (!request) {
+      return res.status(404).json({ message: 'No request found for this user' });
     }
 
-    // 3. עדכון הנתונים בתוך מונגו!
-    // אנחנו משתמשים ב-$set כדי לעדכן רק את האובייקט family בלי למחוק את שאר השלבים
-    const updatedRequest = await Request.findByIdAndUpdate(
-      requestId,
-      { $set: { family: family } },
-      { new: true, runValidators: true } // new: true מחזיר את האובייקט המעודכן
-    );
-
-    // אם הבקשה לא קיימת בבסיס הנתונים
-    if (!updatedRequest) {
-      return res.status(404).json({ error: "הבקשה למענק לא נמצאה במערכת" });
-    }
-
-    // 4. החזרת תשובת הצלחה ל-React
-    res.status(200).json({
-      message: "פרטי המשפחה עודכנו בהצלחה בשרת!",
-      request: updatedRequest
-    });
-
+    res.json(formatRequestResponse(request));
   } catch (error) {
-    console.error("Error in updateFamilyStep:", error);
-    res.status(500).json({ error: "שגיאה פנימית בשרת בעת שמירת פרטי המשפחה" });
+    console.error('Error in getRequestStatus:', error);
+    res.status(500).json({ message: error.message });
   }
+};
+
+const getCurrentRequestStatus = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const request = await fetchLatestRequestForUser(userId);
+
+    if (!request) {
+      return res.status(404).json({ message: 'No request found for this user' });
+    }
+
+    res.json(formatRequestResponse(request));
+  } catch (error) {
+    console.error('Error in getCurrentRequestStatus:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  getRequestStatus,
+  getCurrentRequestStatus,
 };

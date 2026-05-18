@@ -253,10 +253,10 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep, studentId
                     )}
                   </div>
 
-                </div>
-              </div>
             </div>
           </div>
+        </div>
+      </div>
 
           {/* ====== כפתורים ====== */}
           <div className="bg-gray-50 border-t border-[#e2dfd8] px-8 py-6 flex items-center justify-between mt-4 rounded-b-2xl">
