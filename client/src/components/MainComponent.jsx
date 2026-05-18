@@ -4,76 +4,76 @@ export const MainComponent = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#E8E3D7] flex flex-col items-center justify-center px-4" dir="rtl">
+    <main className="min-h-screen bg-gradient-to-b from-[#E8E3D7] via-[#F9F7EF] to-[#E0E7F7] relative overflow-hidden" dir="rtl">
+      <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-[#1f4ea8]/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-16 right-0 h-96 w-96 rounded-full bg-[#071325]/10 blur-3xl" />
 
-      {/* Logo */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="bg-[#071325] p-4 rounded-2xl mb-4 shadow-lg shadow-[#071325]/20">
-          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422A12 12 0 0112 21.5a12 12 0 01-6.16-10.922L12 14z" />
-          </svg>
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
+        <div className="w-full max-w-6xl">
+          <section className="overflow-hidden rounded-[32px] border border-[#071325]/10 bg-white/85 shadow-[0_40px_120px_-65px_rgba(7,19,37,0.65)] backdrop-blur-xl">
+            <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="p-10 text-right lg:p-14">
+                <span className="inline-flex rounded-full bg-[#1f4ea8]/10 px-4 py-2 text-sm font-semibold text-[#1f4ea8]">
+                  מערכת מענקי סטודנטים
+                </span>
+                <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-[#071325] sm:text-5xl">
+                  החוויה החדשה להגשת בקשות מענק אקדמי
+                </h1>
+                <p className="mt-6 max-w-2xl text-base leading-8 text-[#475569] sm:text-lg">
+                  כאן תוכל להגיש בקשות מענק, לעקוב אחרי הסטטוס שלהן, ולנהל את המסמכים האקדמיים שלך בצורה מאורגנת וברורה. המערכת שלנו מותאמת במיוחד לסטודנטים המעוניינים לחסוך זמן ולהגביר את סיכויי קבלת התמיכה.
+                </p>
+                <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="inline-flex items-center justify-center rounded-3xl bg-[#071325] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#071325]/20 transition hover:bg-[#0b294c]"
+                  >
+                    התחבר עכשיו
+                  </button>
+                </div>
+
+                <div className="mt-12 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-[24px] border border-[#071325]/10 bg-[#F7F6F0] p-5">
+                    <p className="text-sm font-semibold text-[#071325]">הגש בקשות בצורה מהירה</p>
+                    <p className="mt-2 text-sm leading-6 text-[#64748b]">טפסים דיגיטליים שמפשטים את התהליך ומפחיתים בירוקרטיה.</p>
+                  </div>
+                  <div className="rounded-[24px] border border-[#071325]/10 bg-[#F7F6F0] p-5">
+                    <p className="text-sm font-semibold text-[#071325]">עקוב אחרי כל שלב</p>
+                    <p className="mt-2 text-sm leading-6 text-[#64748b]">עדכוני סטטוס ברורים שיעזרו לך לדעת בדיוק היכן הבקשה נמצאת.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative flex items-center justify-center p-10 lg:p-14">
+                <div className="relative w-full rounded-[32px] bg-[#1f4ea8]/10 p-8 shadow-[0_24px_60px_-30px_rgba(7,19,37,0.35)]">
+                  <div className="rounded-[28px] border border-[#071325]/10 bg-white p-7 shadow-sm">
+                    <div className="flex items-center justify-between gap-4 rounded-3xl bg-[#071325] p-5 text-white sm:px-6">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.24em] text-[#cbd5ea]">מענק אקדמי</p>
+                        <p className="mt-3 text-lg font-semibold">קבל תמיכה בניהול הבקשה</p>
+                      </div>
+                      <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-white/15 text-2xl">
+                        ⭐
+                      </div>
+                    </div>
+                    <div className="mt-8 space-y-5">
+                      <div className="rounded-[24px] bg-[#F8FAFC] p-5">
+                        <p className="text-sm font-semibold text-[#071325]">הגשה מאובטחת</p>
+                        <p className="mt-2 text-sm leading-6 text-[#64748b]">שמור על מידע אישי ומסמכים בצורה בטוחה ונגישה.</p>
+                      </div>
+                      <div className="rounded-[24px] bg-[#F8FAFC] p-5">
+                        <p className="text-sm font-semibold text-[#071325]">תמיכה ברורה</p>
+                        <p className="mt-2 text-sm leading-6 text-[#64748b]">התקדמות יומיומית ושליטה בכל הפניות שלך במערכת.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pointer-events-none absolute -right-10 top-10 hidden h-24 w-24 rounded-full bg-[#1f4ea8]/20 blur-3xl lg:block" />
+                  <div className="pointer-events-none absolute -bottom-10 left-10 hidden h-28 w-28 rounded-full bg-[#071325]/10 blur-3xl lg:block" />
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-        <h1 className="text-3xl font-bold text-[#071325] tracking-wide">מערכת מענקים</h1>
-        <p className="text-[#071325] mt-2 text-sm">ברוכים הבאים — בחר כיצד להמשיך</p>
       </div>
-
-      {/* Cards */}
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-2xl">
-
-        {/* Student Login card */}
-        <button
-          onClick={() => navigate('/login')}
-          className="flex-1 bg-white border border-[#e2dfd8] rounded-2xl p-8 text-right
-                     hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group"
-        >
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full" />
-          <div className="flex flex-col items-center text-center relative z-10">
-            <div className="bg-[#071325] p-4 rounded-2xl mb-6 shadow-lg shadow-[#071325]/20 group-hover:scale-105 transition-transform">
-              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-[#071325] mb-3">כניסת סטודנטים</h2>
-            <p className="text-[#071325] text-sm mb-6 leading-relaxed">כניסה למערכת לצפייה בבקשות המענק ומעקב אחר הטיפול בהן</p>
-            <span className="text-[#071325] text-sm flex items-center gap-1">
-              כניסה
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </span>
-          </div>
-        </button>
-
-        {/* Admin register card */}
-        <button
-          onClick={() => navigate('/admin-requests')}
-          className="flex-1 bg-white border border-[#e2dfd8] rounded-2xl p-8 text-right
-                     hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group"
-        >
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full" />
-          <div className="flex flex-col items-center text-center relative z-10">
-            <div className="bg-[#071325] p-4 rounded-2xl mb-6 shadow-lg shadow-[#071325]/20 group-hover:scale-105 transition-transform">
-              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-[#071325] mb-3">הרשמה כמנהל</h2>
-            <p className="text-[#071325] text-sm mb-6 leading-relaxed">ניהול בקשות מענקים וטיפול בפניות סטודנטים במערכת</p>
-            <span className="text-[#071325] text-sm flex items-center gap-1">
-              הרשמה
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </span>
-          </div>
-        </button>
-
-      </div>
-
-      <p className="mt-12 text-[#071325]/30 text-xs">© 2025 מערכת מענקים</p>
-    </div>
+    </main>
   );
 };
