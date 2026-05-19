@@ -1,108 +1,198 @@
-import React, { useState, useEffect } from 'react';
-import './admin-requests.css'; // השורה הזו מחברת את העיצוב למעלה
 
-function AdminRequests() {
-  const [searchId, setSearchId] = useState('');
-  const [searchCity, setSearchCity] = useState('');
+import { useEffect, useState } from "react";
+
+const AdminRequests = () => {
   const [requests, setRequests] = useState([]);
+  const [filters, setFilters] = useState({
+    id: "",
+    city: "",
+    startDate: "",
+    endDate: ""
+  });
+  // const [filteredRequests, setFilteredRequests] = useState([]);
 
 
+  const filteredRequests = requests.filter(req => {
 
 
+    const matchId =
+      filters.id === "" || (req.id || req._id)?.includes(filters.id);
 
-  
-  const fetchRequests = async () => {
-    console.log("הכפתור נלחץ! מחפש את:", searchId, searchCity); // שורת בדיקה
-    try {
-      const response = await fetch(`http://localhost:5000/api/admin/search?id=${searchId}&city=${searchCity}`);
-      const data = await response.json();
-      setRequests(data);
-    } catch (error) {
-      console.error("שגיאה במשיכת נתונים:", error);
-    }
+    const matchCity =
+      filters.city === "" ||
+      req.city?.toLowerCase().includes(filters.city.toLowerCase());
+
+    const matchStart =
+      !filters.startDate ||
+      new Date(req.createdAt) >= new Date(filters.startDate);
+
+    const matchEnd =
+      !filters.endDate ||
+      new Date(req.createdAt) <= new Date(filters.endDate);
+
+    return matchId && matchCity && matchStart && matchEnd;
+  });
+
+  const handleFilter = () => {
+    console.log(filteredRequests);
+
   };
 
   useEffect(() => {
-    fetchRequests();
+    fetch("http://localhost:5000/api/search")
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setRequests(data);
+      });
   }, []);
-
   return (
-    <div className="dashboard-container">
-      <nav className="main-navbar">
-        <a href="/" className="nav-logo">
-          <div className="logo-icon">🎓</div>
-          <span className="logo-text">מערכת מענקים</span>
-        </a>
-        <div className="nav-links">
-          <a href="/login" className="nav-link-btn">🚪 יציאה / כניסת משתמש</a>
+    <div className="min-h-screen bg-[#E8E3D7] px-6 py-10" dir="rtl">
+      <div className="max-w-4xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-10">
+          <span className="text-sm text-[#071325]/60">שלום, מנהל המערכת 👋</span>
+          <h1 className="text-3xl font-bold text-[#071325] mt-1 mb-2">ניהול בקשות מענק</h1>
+          <p className="text-[#071325]/70">כל הבקשות הממתינות לטיפול במערכת</p>
         </div>
-      </nav>
 
-      <div className="content-wrapper">
-        <header className="page-header">
-          <span className="welcome-text">שלום, מנהל המערכת 👋</span>
-          <h1 className="main-title">ניהול בקשות מענק</h1>
-          <p className="sub-title">כל הבקשות הממתינות לטיפול במערכת</p>
-        </header>
+        {/* ריבוע המונה */}
+        <div className="bg-blue-100 text-blue-800 p-3 rounded-lg shadow-sm mb-4 inline-block font-bold">
+          נמצאו {requests.length} בקשות מתאימות
+        </div>
 
-        <section className="filter-panel">
-          <div className="filter-grid">
-            <div className="input-group">
-              <label>חיפוש לפי ת.ז</label>
-              <input 
-                type="text" 
-                placeholder="הזן מספר זהות..." 
-                value={searchId}
-                onChange={(e) => setSearchId(e.target.value)} 
+        {/* הטבלה שלך
+        <div className="mt-6">
+          {filteredRequests.length > 0 ? (
+            <Table data={filteredRequests} />
+          ) : (
+            //<p className="text-gray-500 text-center">לא נמצאו תוצאות העונות לסינון</p>
+          )
+          }
+        </div> */}
+
+        {/* Filter panel */}
+        <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#071325]">חיפוש לפי ת.ז</label>
+              <input
+                type="text"
+                placeholder="הזן מספר זהות..."
+                value={filters.id}
+                onChange={(e) =>
+                  setFilters({ ...filters, id: e.target.value })
+                }
+                className="border border-[#e2dfd8] rounded-xl px-4 py-2 text-sm text-[#071325] bg-[#E8E3D7]/40 focus:outline-none focus:border-[#071325]/40 transition"
               />
             </div>
-            <div className="input-group">
-              <label>עיר מגורים</label>
-              <input 
-                type="text" 
-                placeholder="עיר..." 
-                value={searchCity}
-                onChange={(e) => setSearchCity(e.target.value)}
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#071325]">עיר מגורים</label>
+              <input
+                type="text"
+                placeholder="עיר..."
+                value={filters.city}
+                onChange={(e) =>
+                  setFilters({ ...filters, city: e.target.value })
+                }
+                className="border border-[#e2dfd8] rounded-xl px-4 py-2 text-sm text-[#071325] bg-[#E8E3D7]/40 focus:outline-none focus:border-[#071325]/40 transition"
               />
             </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-            <button className="primary-button" onClick={fetchRequests}>סנן תוצאות</button>
-          </div>
-        </section>
 
-        <section className="table-section">
-          <table className="requests-table">
-            <thead>
-              <tr>
-                <th>שם סטודנט</th>
-                <th>תעודת זהות</th>
-                <th>עיר</th>
-                <th>סכום</th>
-                <th>סטטוס</th>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#071325]">מתאריך</label>
+              <input
+                type="date"
+                onChange={(e) =>
+                  setFilters({ ...filters, startDate: e.target.value })
+                }
+                className="border border-[#e2dfd8] rounded-xl px-4 py-2 text-sm text-[#071325] bg-[#E8E3D7]/40 focus:outline-none focus:border-[#071325]/40 transition"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#071325]">עד תאריך</label>
+              <input
+                type="date"
+                onChange={(e) =>
+                  setFilters({ ...filters, endDate: e.target.value })
+                }
+                className="border border-[#e2dfd8] rounded-xl px-4 py-2 text-sm text-[#071325] bg-[#E8E3D7]/40 focus:outline-none focus:border-[#071325]/40 transition"
+              />
+            </div>
+
+          </div>
+
+          <div className="flex justify-center mt-8">
+            {/* <button className="bg-[#071325] hover:bg-[#0d2544] text-white text-sm font-medium px-8 py-2.5 rounded-xl transition">
+              סנן תוצאות
+            </button> */}
+          </div>
+        </div>
+
+        {/* Table placeholder */}
+        <table className="w-full mt-6 bg-white rounded-xl overflow-hidden shadow">
+
+          <thead className="bg-gray-100 text-sm">
+            <tr>
+              <th className="p-2">ת.ז</th>
+              <th>שם מלא</th>
+              <th>מגמה</th>
+              <th>תאריך הגשה</th>
+              <th>סטטוס</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredRequests.map((req) => (
+              <tr key={req._id} className="border-t text-sm">
+
+                {/* ת.ז */}
+                <td className="p-2">{req.id}</td>
+
+                {/* שם */}
+                <td>{req.studentName}</td>
+
+                {/* עיר */}
+                <td>{req.city}</td>
+
+                {/* תאריך */}
+                <td>
+                  {new Date(req.createdAt).toLocaleDateString('he-IL')}
+                </td>
+
+                {/* סטטוס */}
+                <td>
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${req.status === 'approved'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                      }`}
+                  >
+                    {req.status}
+                  </span>
+                </td>
+
+                {/* כפתור */}
+                <td>
+                  {/* <button
+                    onClick={handleFilter}
+                    className="bg-[#071325] hover:bg-[#0d2544] text-white text-sm font-medium px-8 py-2.5 rounded-xl transition"
+                  >
+                    סנן תוצאות
+                  </button> */}
+                </td>
+
               </tr>
-            </thead>
-            <tbody>
-              {requests.length > 0 ? (
-                requests.map((item) => (
-                  <tr key={item._id}>
-                    <td>{item.studentName}</td>
-                    <td>{item.studentId}</td>
-                    <td>{item.city}</td>
-                    <td>{item.amount}₪</td>
-                    <td>{item.status}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#a0b3bc' }}>
-                    לא נמצאו נתונים להצגה. וודאי שהשרת רץ ויש נתונים ב-Database.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
+            ))}
+          </tbody>
+
+        </table>
+
       </div>
     </div>
   );

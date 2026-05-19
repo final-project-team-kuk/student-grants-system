@@ -5,15 +5,14 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import { MainComponent } from './components/MainComponent'
 import AdminRequests from './components/AdminRequests';
-function App() {
-  const [count, setCount] = useState(0)
-  
+import React from 'react';
+import './App.css';
+import { Router } from './components/routing/Router';
 
-  return (
-    <>
-<AdminRequests />    
-</>
-  )
+function App() {
+    const [count, setCount] = useState(0)
+
+  return <Router />;
 }
 
-export default App
+export default App;

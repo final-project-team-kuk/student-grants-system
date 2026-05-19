@@ -1,6 +1,20 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express');const router = express.Router();
 const AdminRequest = require('../models/AdminRequest');
+
+router.get('/', async (req, res) => {
+    try {
+        const query = {};
+
+        const results = await AdminRequest.find(query);
+
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+// console.log(results);
+
+// res.json(results);
 
 // נתיב לחיפוש וסינון בקשות
 router.get('/search', async (req, res) => {
@@ -24,6 +38,7 @@ router.get('/search', async (req, res) => {
         const results = await AdminRequest.find(query);
         res.json(results);
     } catch (err) {
+        console.log(err);
         res.status(500).json({ message: err.message });
     }
 });
