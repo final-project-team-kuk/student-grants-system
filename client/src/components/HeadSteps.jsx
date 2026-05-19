@@ -12,7 +12,9 @@ export default function HeaderSteps() {
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד, כדי ששום דבר לא ייאבד במעברים
   const [formData, setFormData] = useState({
     // שדות שלב 2 (פרטי משפחה) - יתווספו כאן לפי הצורך
-    
+    fatherId: '',
+    fatherLastName: '',
+    fatherFirstName: '',
     // שדות שלב 4 (פרטי בנק)
     accountHolderId: '',
     bankName: '',
@@ -21,11 +23,18 @@ export default function HeaderSteps() {
   });
 
   // פונקציית עדכון השדות הגלובלית
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
+  // 2. תוספת: פונקציה חדשה שמקבלת נתונים משלב ספציפי וממזגת אותם לתוך ה-State הגלובלי
+  const handleStepSubmit = (stepData) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      ...stepData, // לוקח את מה שהיה ומוסיף/מעדכן את השדות החדשים שהגיעו מהשלב
     }));
   };
 
@@ -54,7 +63,7 @@ export default function HeaderSteps() {
 
       case 2:
         // ✅ שלב 2 מוכן ומחובר!
-        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} formData={formData} handleChange={handleChange} currentStep={currentStep} />;
+        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} defaultValues={formData} onStepSubmit={handleStepSubmit}  />;
 
       case 3:
         return (
@@ -70,7 +79,7 @@ export default function HeaderSteps() {
 
       case 4:
         // ✅ שלב 4 מוכן ומחובר!
-        return <FromStepFour formData={formData} handleChange={handleChange} nextStep={goToNextStep} prevStep={goToPrevStep} />;
+        return <FromStepFour defaultValues={formData} onStepSubmit={handleStepSubmit} nextStep={goToNextStep} prevStep={goToPrevStep} />;
 
       case 5:
         return (
@@ -90,7 +99,9 @@ export default function HeaderSteps() {
             <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 6: אישור ושליחה</h2>
             <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
             <div className="flex justify-center gap-4">
-              <button onClick={() => alert('הטופס נשלח בהצלחה! (בכאילו)')} className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold">שלח בקשה סופית</button>
+              <button onClick={() =>{
+                console.log("הנתונים הסופיים של כל הטופס",formData); alert('הטופס נשלח בהצלחה! (בכאילו)')}}
+               className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold">שלח בקשה סופית</button>
               <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
             </div>
           </div>

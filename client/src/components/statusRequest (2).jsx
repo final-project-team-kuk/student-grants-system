@@ -61,10 +61,10 @@ export default function ScholarshipStatus() {
     const fetchStatus = async () => {
       try {
         // 1. שומרים זמנית את המשתמש המדומה (נועה לוי) בתוך ה-localStorage
-        localStorage.setItem("userId", "66a111111111111111111111"); 
+        localStorage.setItem("nationalId", "987654321"); 
         
         // 2. שולפים את ה-ID *בתוך* הפונקציה כדי שיהיה מעודכן ב-100%
-        const currentUserId = localStorage.getItem("userId"); 
+        const currentUserId = localStorage.getItem("nationalId"); 
 
         if (!currentUserId) {
           throw new Error("לא נמצא מזהה משתמש מחובר.");

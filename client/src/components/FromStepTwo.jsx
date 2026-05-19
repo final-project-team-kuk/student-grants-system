@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form'; // הייבוא של הספרייה החדשה
 
-export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
+export default function FromStepTwo({ nextStep, prevStep, defaultValues, onStepSubmit}) {
   
   // בדיקה שהתעודת זהות תקינה (לחבר לא חובר עדיין) 
   const isValidTZ = (id) => {
@@ -17,11 +17,12 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
     register, // פונקציה ש"רושמת" את השדות למערכת המעקב
     handleSubmit, // פונקציה שעוטפת את פעולת השליחה ובודקת שהכל תקין
     formState: { errors } // אובייקט שמכיל את כל השגיאות, אם יש
-  } = useForm();
+  } = useForm({ defaultValues: defaultValues }); // אתחול הערכים עם הנתונים מהאב, אם יש
 
   // הפונקציה שתרוץ *רק* אם כל הבדיקות עברו בהצלחה
   const onValidSubmit = (data) => {
     console.log("הנתונים תקינים:", data); // כאן תוכלי בהמשך לשמור את הנתונים
+    onStepSubmit(data); // שומר את הנתונים באב
     nextStep(); // עוברים לשלב הבא!
   };
 

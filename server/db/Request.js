@@ -96,4 +96,5 @@ const requestSchema = new mongoose.Schema({
   }
  
 });
-module.exports = mongoose.model("Request", requestSchema);
+module.exports = mongoose.models.Request || mongoose.model('Request', requestSchema);
+//module.exports = mongoose.model("Request", requestSchema);

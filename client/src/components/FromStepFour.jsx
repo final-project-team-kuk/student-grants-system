@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form'; // 1. מייבאים את הספרייה החדשה
 
-export default function BankDetailsStep({ nextStep, prevStep }) {
+export default function BankDetailsStep({ nextStep, prevStep,defaultValues, onStepSubmit }) {
   
   // פונקציית בדיקת תקינות תעודת זהות ישראלית
   const isValidTZ = (id) => {
@@ -17,11 +17,12 @@ export default function BankDetailsStep({ nextStep, prevStep }) {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm();
+  } = useForm({ defaultValues:defaultValues });
 
   // הפונקציה שתרוץ רק אם כל השדות בפרטי הבנק תקינים לחלוטין
   const onValidSubmit = (data) => {
     console.log("נתוני בנק תקינים ומאושרים:", data);
+    onStepSubmit(data); // שומר את הנתונים באב
     nextStep(); // עוברים בהצלחה לשלב 5!
   };
 

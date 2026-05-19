@@ -8,9 +8,11 @@ const {
   updateStatus,
   remove
 } = require("../controllers/addRequestCrude");
+// 👑 שלב א': מייבאים את הפונקציה הנכונה מהקונטרולר של הסטטוס
+const { getRequestStatus } = require("../controllers/requestController");
 
 const router = Router();
-
+router.get("/status/:userId", getRequestStatus); // <--- זה הניתוב שהיה חסר!
 //  Method   Path                      Controller
 router.post  ("/",           create);        // create new request
 router.get   ("/",           read);          // get all (+ optional filters)

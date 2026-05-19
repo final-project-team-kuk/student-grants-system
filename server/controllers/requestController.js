@@ -11,9 +11,8 @@ const formatRequestResponse = (request) => ({
 const getRequestStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    const objectId = new mongoose.Types.ObjectId(userId);
-    const request = await Request.findOne({ userId: objectId }).sort({ createdAt: -1 });
-
+   // const objectId = new mongoose.Types.ObjectId(userId);
+const request = await Request.findOne({ "userSnapshot.nationalId": userId }).sort({ createdAt: -1 });
     if (!request) {
       return res.status(404).json({ message: 'No request found for this user' });
     }
