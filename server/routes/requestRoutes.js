@@ -1,15 +1,22 @@
-// routes/requestRoutes.js
-const express = require('express');
-const router = express.Router();
-const {getCurrentRequestStatus,getRequestStatus } = require('../controllers/requestController');
+const express = require("express");
+const { Router } = express;
+const {
+  create,
+  read,
+  readOne,
+  update,
+  updateStatus,
+  remove
+} = require("../controllers/addRequestCrude");
 
+const router = Router();
 
-// נתיב לקבלת הסטטוס (יתורגם ל- GET /api/requests/status)
-router.get('/status/:userId', getRequestStatus);
-router.get('/current-status', getCurrentRequestStatus);
-//router.post('/submit', submitNewRequest);
-
-// נתיב זמני ליצירת בקשה בבסיס הנתונים לצורך טסטים (POST /api/requests)
-//router.post('/requests', createMockRequest);
+//  Method   Path                      Controller
+router.post  ("/",           create);        // create new request
+router.get   ("/",           read);          // get all (+ optional filters)
+router.get   ("/:id",        readOne);       // get one by id
+router.put   ("/:id",        update);        // update any fields
+router.patch ("/:id/status", updateStatus);  // change status only
+router.delete("/:id",        remove);        // delete
 
 module.exports = router;
