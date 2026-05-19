@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const gradCap = (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
@@ -6,302 +8,183 @@ const gradCap = (
   </svg>
 );
 
-export default function Register({ onSwitchToLogin }) {
-  const [activeTab, setActiveTab] = useState("register");
+export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     idNumber: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (field) => (e) =>
+  const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
 
-const handleSubmit = async () => {
-  setIsLoading(true);
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+  const validateForm = () => {
+    const tempErrors = {};
+    const nameRegex = /^[a-zA-Zא-ת\s]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if (response.ok) {
-      alert("נרשמת בהצלחה!");
-      onSwitchToLogin();
+    if (!form.firstName.trim()) tempErrors.firstName = "שם פרטי הוא שדה חובה";
+    else if (!nameRegex.test(form.firstName.trim())) tempErrors.firstName = "שם פרטי חייב להכיל אותיות בלבד";
+    else if (form.firstName.trim().length < 2) tempErrors.firstName = "שם פרטי חייב להכיל לפחות 2 אותיות";
+
+    if (!form.lastName.trim()) tempErrors.lastName = "שם משפחה הוא שדה חובה";
+    else if (!nameRegex.test(form.lastName.trim())) tempErrors.lastName = "שם משפחה חייב להכיל אותיות בלבד";
+    else if (form.lastName.trim().length < 2) tempErrors.lastName = "שם משפחה חייב להכיל לפחות 2 אותיות";
+    
+    // כאן השינוי היחיד שביקשת - בדיקה של בדיוק 9 ספרות
+    if (!form.idNumber.trim()) tempErrors.idNumber = "מספר זהות הוא שדה חובה";
+    else if (!/^\d{9}$/.test(form.idNumber.trim())) tempErrors.idNumber = "מספר זהות חייב להכיל בדיוק 9 ספרות";
+
+    if (!form.email.trim()) tempErrors.email = "כתובת אימייל היא שדה חובה";
+    else if (!emailRegex.test(form.email.trim())) tempErrors.email = "כתובת האימייל אינה תקינה";
+
+    if (!form.password) tempErrors.password = "סיסמה היא שדה חובה";
+    else if (form.password.length < 6) tempErrors.password = "הסיסמה חייבת להכיל לפחות 6 תווים";
+    else if (!/[a-zA-Zא-ת]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל לפחות אות אחת";
+    else if (!/[0-9]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל לפחות מספר אחד";
+    else if (!/[@$!%*?&_#^()-]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל סימן מיוחד";
+
+    if (form.password !== form.confirmPassword) tempErrors.confirmPassword = "הסיסמאות אינן תואמות";
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'טופס לא תקין',
+        text: 'נא לוודא שכל השדות מלאים לפי הדרישות',
+        confirmButtonColor: '#0A192F'
+      });
+      return;
     }
-  } catch (error) {
-    console.error("שגיאה ברישום:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          idNumber: form.idNumber.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'נרשמת בהצלחה!',
+          text: 'החשבון נוצר, מעביר אותך לדף ההתחברות',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setForm({ firstName: "", lastName: "", idNumber: "", email: "", password: "", confirmPassword: "" });
+        navigate("/login");
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה ברישום',
+          text: data.error || "אירעה שגיאה בשרת",
+          confirmButtonColor: '#d33'
+        });
+      }
+    } catch (err) {
+      console.error("שגיאה ברישום:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'שגיאת תקשורת',
+        text: 'לא ניתן להתחבר לשרת כרגע',
+        confirmButtonColor: '#d33'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fields = [
-    { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
-    { key: "lastName",        label: "שם משפחה",      placeholder: "הזן שם משפחה",     type: "text"     },
-    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
-    { key: "password",        label: "סיסמה",         placeholder: "בחר סיסמה",        type: "password" },
-    { key: "confirmPassword", label: "אימות סיסמה",   placeholder: "הזן סיסמה שוב",   type: "password" },
+    { key: "firstName", label: "שם פרטי", placeholder: "הזן שם פרטי", type: "text" },
+    { key: "lastName", label: "שם משפחה", placeholder: "הזן שם משפחה", type: "text" },
+    { key: "idNumber", label: "מספר זהות", placeholder: "הזן מספר זהות", type: "text" },
+    { key: "email", label: "אימייל", placeholder: "הזן אימייל (באנגלית)", type: "email" },
+    { key: "password", label: "סיסמה", placeholder: "בחר סיסמה חזקה", type: "password" },
+    { key: "confirmPassword", label: "אימות סיסמה", placeholder: "הזן סיסמה שוב", type: "password" },
   ];
 
   return (
-    <div style={styles.root}>
-      {/* כתמים בולטים יותר ברקע */}
-      <div style={styles.blob1} />
-      <div style={styles.blob2} />
+    <div className="min-h-screen bg-[#F2EDE4] flex justify-center relative overflow-y-auto px-4 pt-10 pb-12 select-none font-['Heebo']" style={{ direction: "rtl" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      <div style={styles.container}>
-        {/* Logo */}
-        <div style={styles.logoWrap}>
-          <div style={styles.logoIcon}>{gradCap}</div>
+      <div className="fixed w-[580px] h-[580px] rounded-full -top-[120px] -left-[100px] blur-[80px] pointer-events-none bg-gradient-to-br from-[#0a192f]/18 to-transparent" />
+      <div className="fixed w-[450px] h-[450px] rounded-full -bottom-[80px] -right-[60px] blur-[70px] pointer-events-none bg-gradient-to-tl from-[#0a192f]/14 to-transparent" />
+
+      <div className="flex flex-col items-center gap-4 z-10 w-full max-w-[480px] mt-6 animate-[fadeUp_0.7s_ease_both]">
+        <div className="mb-1">
+          <div className="w-[68px] h-[68px] rounded-[18px] bg-[#0A192F] flex items-center justify-center shadow-[0_8px_32px_rgba(10,25,47,0.25)]">
+            {gradCap}
+          </div>
         </div>
 
-        {/* Title */}
-        <h1 style={styles.title}>מערכת מענקים לסטודנטים</h1>
-        <p style={styles.subtitle}>ניהול בקשות מענק אקדמי</p>
+        <div className="text-center">
+          <h1 className="text-[#0A192F] text-[26px] font-[800] tracking-[-0.3px]">מערכת מענקים לסטודנטים</h1>
+          <p className="text-[#5C6370] text-sm font-[300] mt-1">ניהול בקשות מענק אקדמי</p>
+        </div>
 
-        {/* Card */}
-        <div style={styles.card}>
-          {/* Tabs */}
-          <div style={styles.tabRow}>
-            <button
-              style={{ ...styles.tab, ...(activeTab === "register" ? styles.tabActive : styles.tabInactive) }}
-              onClick={() => setActiveTab("register")}
-            >
+        <div className="w-full flex flex-col bg-white/70 backdrop-blur-[18px] border border-[#0A192F]/10 rounded-[20px] p-7 gap-[18px] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
+          
+          <div className="flex rounded-xl bg-[#E5E0D5] p-1 gap-1">
+            <button type="button" style={{ flex: 1 }} className="py-2.5 rounded-[9px] text-[15px] font-[600] bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]">
               הרשמה
             </button>
-            <button
-              style={{ ...styles.tab, ...(activeTab === "login" ? styles.tabActive : styles.tabInactive) }}
-              onClick={() => { setActiveTab("login"); onSwitchToLogin?.(); }}
-            >
+            <button type="button" onClick={() => navigate("/login")} className="flex-1 py-2.5 rounded-[9px] text-[15px] font-[600] transition-all duration-200 outline-none cursor-pointer bg-transparent text-[#5C6370] hover:opacity-80">
               כניסה למערכת
             </button>
           </div>
 
-          {/* Fields */}
           {fields.map(({ key, label, placeholder, type }) => (
-            <div key={key} style={styles.fieldGroup}>
-              <label style={styles.label}>{label}</label>
+            <div key={key} className="flex flex-col gap-1.5">
+              <label className="text-[#0A192F] text-sm font-[600] text-right">{label}</label>
               <input
-                style={styles.input}
                 type={type}
                 value={form[key]}
                 onChange={handleChange(key)}
                 placeholder={placeholder}
                 dir="rtl"
+                className={`w-full bg-white border rounded-xl py-3 px-[18px] text-[#0A192F] text-[15px] text-right placeholder-[#A0AEC0] transition-all duration-200 outline-none focus:border-[#0A192F] focus:ring-[3px] focus:ring-[#0A192F]/15 ${
+                  errors[key] ? "border-[#E53E3E] focus:border-[#E53E3E] focus:ring-[#E53E3E]/15" : "border-[#D1D5DB]"
+                }`}
               />
+              {errors[key] && <span className="text-[#E53E3E] text-xs text-right font-medium mt-0.5">{errors[key]}</span>}
             </div>
           ))}
 
-          {/* Submit */}
-          <button
-            style={{ ...styles.submitBtn, ...(isLoading ? styles.submitBtnLoading : {}) }}
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
+          <button onClick={handleSubmit} disabled={isLoading} className={`w-full py-3.5 rounded-xl text-base font-[700] tracking-[0.3px] shadow-[0_6px_24px_rgba(10,25,47,0.2)] mt-1 transition-all duration-200 outline-none active:scale-[0.98] ${isLoading ? "bg-[#0A192F]/70 text-[#F5F1E9]/80 cursor-not-allowed" : "bg-[#0A192F] text-[#F5F1E9] cursor-pointer hover:opacity-92"}`}>
             {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
           </button>
 
-          {/* Footer */}
-          <p style={styles.footerText}>
-            כבר יש לך חשבון?{" "}
-            <span style={styles.footerLink} onClick={() => onSwitchToLogin?.()}>
-              כניסה למערכת
-            </span>
+          <p className="text-[#5C6370] text-[13px] text-center -mt-1">
+            כבר יש לך חשבון? <span onClick={() => navigate("/login")} className="text-[#0A192F] cursor-pointer font-[600] underline underline-offset-2 hover:opacity-80">כניסה למערכת</span>
           </p>
         </div>
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        input::placeholder { color: #A0AEC0; }
-        input:focus { outline: none; border-color: #0A192F !important; box-shadow: 0 0 0 3px rgba(10,25,47,0.15); }
-        button { transition: opacity 0.2s, transform 0.15s; }
-        button:hover:not(:disabled) { opacity: 0.92; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes blobFloat {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50%       { transform: translateY(-30px) scale(1.05); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
 }
-
-const styles = {
-  root: {
-    minHeight: "100vh",
-    background: "#F2EDE4",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'Heebo', sans-serif",
-    direction: "rtl",
-    position: "relative",
-    overflow: "hidden",
-    padding: "40px 16px",
-  },
-  blob1: {
-    position: "fixed",
-    width: 580,
-    height: 580,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
-    top: "-120px",
-    left: "-100px",
-    filter: "blur(80px)",
-    animation: "blobFloat 8s ease-in-out infinite",
-    pointerEvents: "none",
-  },
-  blob2: {
-    position: "fixed",
-    width: 450,
-    height: 450,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
-    bottom: "-80px",
-    right: "-60px",
-    filter: "blur(70px)",
-    animation: "blobFloat 10s ease-in-out infinite reverse",
-    pointerEvents: "none",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "16px",
-    animation: "fadeUp 0.7s ease both",
-    zIndex: 1,
-    width: "100%",
-    maxWidth: 480,
-  },
-  logoWrap: { marginBottom: 4 },
-  logoIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    background: "#0A192F",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 8px 32px rgba(10,25,47,0.25)",
-  },
-  title: {
-    color: "#0A192F",
-    fontSize: 26,
-    fontWeight: 800,
-    letterSpacing: "-0.3px",
-    textAlign: "center",
-  },
-  subtitle: {
-    color: "#5C6370",
-    fontSize: 14,
-    fontWeight: 300,
-    textAlign: "center",
-    marginTop: -8,
-  },
-  card: {
-    marginTop: 8,
-    width: "100%",
-    background: "rgba(255, 255, 255, 0.7)",
-    backdropFilter: "blur(18px)",
-    WebkitBackdropFilter: "blur(18px)",
-    border: "1px solid rgba(10,25,47,0.1)",
-    borderRadius: 20,
-    padding: "28px 28px 24px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 18,
-    boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
-  },
-  tabRow: {
-    display: "flex",
-    borderRadius: 12,
-    background: "#E5E0D5",
-    padding: 4,
-    gap: 4,
-  },
-  tab: {
-    flex: 1,
-    padding: "10px 0",
-    borderRadius: 9,
-    border: "none",
-    cursor: "pointer",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    fontWeight: 600,
-    transition: "all 0.22s ease",
-  },
-  tabActive: {
-    background: "#0A192F",
-    color: "#F5F1E9",
-    boxShadow: "0 4px 14px rgba(10,25,47,0.2)",
-  },
-  tabInactive: {
-    background: "transparent",
-    color: "#5C6370",
-  },
-  fieldGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 7,
-  },
-  label: {
-    color: "#0A192F",
-    fontSize: 14,
-    fontWeight: 500,
-    textAlign: "right",
-  },
-  input: {
-    background: "#ffffff",
-    border: "1px solid #D1D5DB",
-    borderRadius: 12,
-    padding: "13px 18px",
-    color: "#0A192F",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    textAlign: "right",
-    width: "100%",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  },
-  submitBtn: {
-    width: "100%",
-    padding: "15px",
-    borderRadius: 12,
-    border: "none",
-    background: "#0A192F",
-    color: "#F5F1E9",
-    fontSize: 16,
-    fontWeight: 700,
-    fontFamily: "'Heebo', sans-serif",
-    cursor: "pointer",
-    letterSpacing: "0.3px",
-    boxShadow: "0 6px 24px rgba(10,25,47,0.2)",
-    marginTop: 4,
-  },
-  submitBtnLoading: {
-    opacity: 0.7,
-    cursor: "not-allowed",
-  },
-  footerText: {
-    color: "#5C6370",
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: -4,
-  },
-  footerLink: {
-    color: "#0A192F",
-    cursor: "pointer",
-    fontWeight: 600,
-    textDecoration: "underline",
-    textUnderlineOffset: 2,
-  },
-};
