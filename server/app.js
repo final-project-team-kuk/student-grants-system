@@ -20,8 +20,8 @@ connectDB();
 // Routes
 // 2. מחברים את הראוטים של ה-Auth לנתיב שהפרונטאנד מחפש (/api/auth)
 app.use('/api/auth', authRoutes); 
-app.use('/api', studentRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/students', studentRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
