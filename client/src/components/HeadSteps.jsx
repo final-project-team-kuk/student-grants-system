@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 // ייבוא הקומפוננטות המוכנות בלבד
 import FromStepTwo from './FromStepTwo'; 
 import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
+import Step3Studies from './Step3Studies';
+import { FormStep5 } from './FormStep5';
 
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = Number(searchParams.get('step')) || 1;
+  const [requestId, setRequestId] = useState(null);
 
-  // ה-State המרכזי שומר את כל נתוני הטופס ביחד, כדי ששום דבר לא ייאבד במעברים
+  // ה-State המרכזי שומר את כל נתוני הטופס ביחד
   const [formData, setFormData] = useState({
-    // שדות שלב 2 (פרטי משפחה) - יתווספו כאן לפי הצורך
-    
     // שדות שלב 4 (פרטי בנק)
     accountHolderId: '',
     bankName: '',
     branchNumber: '',
     accountNumber: '',
+    // ניתן להוסיף כאן עוד שדות לשאר השלבים...
   });
+
+  // טעינת הטיוטה הגלובלית כשהאפליקציה עולה
+  useEffect(() => {
+    const savedGlobalDraft = localStorage.getItem('globalFormDraft');
+    if (savedGlobalDraft) { // תוקן: כאן הייתה שגיאת ההקלדה
+      setFormData(JSON.parse(savedGlobalDraft));
+    }
+  }, []); // רץ פעם אחת בטעינה הראשונית
+
+  // פונקציה גלובלית לשמירת הטיוטה (מעודכנת כדי לתמוך בשלב 2)
+  const handleSaveDraft = (childData = {}) => {
+    const dataToSave = { ...formData, ...childData }; // ממזג את המידע מהאבא עם המידע מהילד
+    setFormData(dataToSave);
+    localStorage.setItem('globalFormDraft', JSON.stringify(dataToSave));
+    alert('כל הנתונים נשמרו כטיוטה בהצלחה!');
+  };
 
   // פונקציית עדכון השדות הגלובלית
   const handleChange = (e) => {
@@ -29,7 +47,7 @@ export default function HeaderSteps() {
     }));
   };
 
-  // פונקציות ניווט (מעבר בין 1 ל-6)
+  // פונקציות ניווט
   const goToNextStep = () => {
     if (currentStep < 6) setSearchParams({ step: currentStep + 1 });
   };
@@ -37,10 +55,8 @@ export default function HeaderSteps() {
     if (currentStep > 1) setSearchParams({ step: currentStep - 1 });
   };
 
-  // רשימת ששת השלבים המלאה להצגה ב-Stepper
   const steps = ['פרטים אישיים', 'פרטי משפחה', 'פרטי לימודים', 'פרטי בנק', 'העלאת קבצים', 'אישור ושליחה'];
 
-  // רינדור דינמי לפי מצב הפיתוח הנוכחי שלכן
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
@@ -48,29 +64,29 @@ export default function HeaderSteps() {
           <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
             <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 1: פרטים אישיים</h2>
             <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
-            <button onClick={goToNextStep} className="px-6 py-2 bg-[#071325] text-white rounded-lg font-bold">דילוג לשלב הבא</button>
-          </div>
-        );
-
-      case 2:
-        // ✅ שלב 2 מוכן ומחובר!
-        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} formData={formData} handleChange={handleChange} currentStep={currentStep} />;
-
-      case 3:
-        return (
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 3: פרטי לימודים</h2>
-            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
             <div className="flex justify-center gap-4">
+              <button onClick={() => handleSaveDraft()} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">שמור טיוטה</button>
               <button onClick={goToNextStep} className="px-6 py-2 bg-[#071325] text-white rounded-lg font-bold">דילוג לשלב הבא</button>
-              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
             </div>
           </div>
         );
 
+      case 2:
+        // תוקן: הוספנו את setFormData כדי ששלב 2 יוכל לעדכן את האבא
+        return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} formData={formData} setFormData={setFormData} currentStep={currentStep} saveDraft={handleSaveDraft} />;
+
+      case 3:
+        return (
+          <Step3Studies
+            nextStep={goToNextStep}
+            prevStep={goToPrevStep}
+            currentStep={currentStep}
+            requestId={requestId}
+          />
+        );
+
       case 4:
-        // ✅ שלב 4 מוכן ומחובר!
-        return <FromStepFour formData={formData} handleChange={handleChange} nextStep={goToNextStep} prevStep={goToPrevStep} />;
+        return <FromStepFour formData={formData} handleChange={handleChange} nextStep={goToNextStep} prevStep={goToPrevStep} saveDraft={handleSaveDraft} />;
 
       case 5:
         return (
@@ -90,8 +106,16 @@ export default function HeaderSteps() {
             <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 6: אישור ושליחה</h2>
             <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
             <div className="flex justify-center gap-4">
-              <button onClick={() => alert('הטופס נשלח בהצלחה! (בכאילו)')} className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold">שלח בקשה סופית</button>
               <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
+              <button 
+                onClick={() => {
+                  alert('הטופס נשלח בהצלחה! (בכאילו)');
+                  localStorage.removeItem('globalFormDraft'); // מוחק את הטיוטה בסיום התהליך
+                }} 
+                className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold"
+              >
+                שלח בקשה סופית
+              </button>
             </div>
           </div>
         );
@@ -101,20 +125,17 @@ export default function HeaderSteps() {
     }
   };
 
-  // חישוב דינמי של אורך קו ההתקדמות הכחול
   const progressWidth = `${((currentStep - 1) / (steps.length - 1)) * 100}%`;
 
   return (
     <div className="min-h-screen bg-[#f4f2ec] py-12" dir="rtl">
       <div className="max-w-3xl mx-auto px-4 pb-12">
         
-        {/* כותרת קבועה לכל השלבים */}
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold text-[#071325] mb-2">הגשת בקשה למענק</h1>
           <p className="text-[#071325] text-sm">מלא את כל השלבים להגשת הבקשה</p>
         </div>
 
-        {/* ה-Stepper המרכזי והחכם */}
         <div className="flex justify-between items-center mb-12 relative px-4">
           <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#d5c9b5] -z-10"></div>
           <div 
@@ -148,7 +169,6 @@ export default function HeaderSteps() {
           })}
         </div>
 
-        {/* תוכן הצעד המשתנה */}
         <div className="transition-all duration-300">
           {renderCurrentStep()}
         </div>
@@ -157,44 +177,3 @@ export default function HeaderSteps() {
     </div>
   );
 }
-// import React from 'react';
-// import { useSearchParams } from 'react-router-dom';
-
-// // ייבוא הקומפוננטות. ודאי שיש לך קבצים עבור השלבים האחרים שאינם בהערה
-// // import FromStepOne from './FromStepOne'; 
-// import FromStepTwo from './FromStepTwo'; 
-// //import FromStepOne from './FromStepOne';
-// export default function HeaderSteps() {
-//   const [searchParams, setSearchParams] = useSearchParams();
-//   const currentStep = Number(searchParams.get('step')) || 1;
-
-//   // הפונקציות שאנחנו מעבירים פנימה כדי לאפשר לכפתורים לעבוד
-//   const goToNextStep = () => setSearchParams({ step: currentStep + 1 });
-//   const goToPrevStep = () => setSearchParams({ step: currentStep - 1 });
-
-//   const renderCurrentStep = () => {
-//     switch (currentStep) {
-//       case 1:
-//         // כאן יש לרנדר את קומפוננטת שלב 1 ברגע שתיצרי אותה
-//         // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-//       //   return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-//       //  case 1:
-//       //   // התיקון: מעבירים את currentStep לתוך השלב כדי שהסרגל יעבוד דינמית
-//         return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
-//         // return <FromStepThree nextStep={goToNextStep} prevStep={goToPrevStep} currentStep={currentStep} />;
-//   //    default:
-//         // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-//        // return <FromStepOne nextStep={goToNextStep} currentStep={currentStep} />;
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-[#f4f2ec] py-12">
-//       <div className="max-w-3xl mx-auto px-4 pb-12">
-//         <div className="mt-8 transition-all duration-300">
-//           {renderCurrentStep()}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
