@@ -6,6 +6,7 @@ import Register from "../Register"
 import AdminRequests from "../AdminRequests"
 import Navbar from "./NavBar"
 import HeadSteps from "../HeadSteps" 
+import AdminRequestDetails from "../AdminRequestDetails";
 
 // 1. מייבאים את קומפוננטת הסטטוס (שימי לב שהשם הפיזי של הקובץ הוא statusRequest (2))
 import ScholarshipStatus from "../statusRequest (2)"

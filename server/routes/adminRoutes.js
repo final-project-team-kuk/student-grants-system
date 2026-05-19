@@ -1,41 +1,30 @@
 const express = require('express');const router = express.Router();
-const AdminRequest = require('../models/AdminRequest');
+const Request = require('../models/requestModel');
 
 router.get('/', async (req, res) => {
     try {
-        const query = {};
-
-        const results = await AdminRequest.find(query);
-
+        const results = await Request.find({});
         res.json(results);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
-// console.log(results);
 
-// res.json(results);
-
-// נתיב לחיפוש וסינון בקשות
 router.get('/search', async (req, res) => {
     try {
         const { id, city, startDate, endDate } = req.query;
         let query = {};
 
-        // אם המשתמש הזין ת.ז
-        if (id) query.id = id;
-        
-        // אם המשתמש הזין עיר
-        if (city) query.city = new RegExp(city, 'i'); // 'i' אומר שלא משנה אם זה אותיות גדולות/קטנות
+        if (id) query['userSnapshot.nationalId'] = new RegExp(id, 'i');
+        if (city) query['personal.city'] = new RegExp(city, 'i');
 
-        // אם המשתמש בחר טווח תאריכים
         if (startDate || endDate) {
             query.createdAt = {};
-            if (startDate) query.createdAt.$gte = new Date(startDate); // גדול או שווה ל...
-            if (endDate) query.createdAt.$lte = new Date(endDate);     // קטן או שווה ל...
+            if (startDate) query.createdAt.$gte = new Date(startDate);
+            if (endDate) query.createdAt.$lte = new Date(endDate);
         }
 
-        const results = await AdminRequest.find(query);
+        const results = await Request.find(query);
         res.json(results);
     } catch (err) {
         console.log(err);

@@ -4,20 +4,24 @@ const mongoose = require("mongoose");
 const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
 const requestRoutes = require('./routes/requestRoutes');
+
+const adminRoutes = require('./routes/adminRoutes');
+
 const { request } = require('node:http');
 require('dotenv').config();
 const app = express();
-app.use('/admin', adminRoutes);
-
-
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/api/admin', adminRoutes);
 app.use('/api', studentRoutes);
-app.use('/api', requestRoutes);
+app.use('/api/requests', requestRoutes);
+
+
+
 
 // Basic Route
 app.get('/', (req, res) => {

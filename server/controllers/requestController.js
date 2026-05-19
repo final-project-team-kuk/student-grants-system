@@ -11,15 +11,18 @@ const create = (req, res) => {
 };
 
 // ─── READ ALL ─────────────────────────────────────────────────────────────────
-const read = (req, res) => {
-  requestModel.find()
-    .then(requests => res.status(200).send(requests))
-    .catch(error => res.status(500).send({ error: error.message }));
+const read = async (req, res) => {
+  try {
+    const requests = await requestModel.find();
+    res.status(200).send(requests || []);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
 };
 
 // ─── READ ONE ─────────────────────────────────────────────────────────────────
 const readOne = (req, res) => {
-  requestModel.findOne({ 'userSnapshot.nationalId': String(req.params.id).trim() })
+  requestModel.findById(req.params.id)
     .then(request => {
       if (!request) return res.status(404).send({ error: 'Request not found' });
       return res.status(200).send(request);

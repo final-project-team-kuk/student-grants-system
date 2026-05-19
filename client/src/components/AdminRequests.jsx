@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminRequests = () => {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [filters, setFilters] = useState({
     id: "",
@@ -16,11 +18,11 @@ const AdminRequests = () => {
 
 
     const matchId =
-      filters.id === "" || (req.id || req._id)?.includes(filters.id);
+      filters.id === "" || String(req.userSnapshot?.nationalId)?.includes(filters.id);
 
     const matchCity =
       filters.city === "" ||
-      req.city?.toLowerCase().includes(filters.city.toLowerCase());
+      req.personal?.city?.toLowerCase().includes(filters.city.toLowerCase());
 
     const matchStart =
       !filters.startDate ||
@@ -38,14 +40,27 @@ const AdminRequests = () => {
 
   };
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/search")
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        setRequests(data);
-      });
-  }, []);
+ useEffect(() => {
+  fetch("http://localhost:5000/api/admin/search")
+    .then(res => res.json())
+    
+
+.then(data => {
+  console.log("API DATA:", data);
+
+  if (!Array.isArray(data)) {
+    setRequests([]);
+    return;
+  }
+
+  setRequests(data);
+})
+
+    .catch(err => {
+      console.log(err);
+      setRequests([]);
+    });
+}, []);
   return (
     <div className="min-h-screen bg-[#E8E3D7] px-6 py-10" dir="rtl">
       <div className="max-w-4xl mx-auto">
@@ -152,13 +167,13 @@ const AdminRequests = () => {
               <tr key={req._id} className="border-t text-sm">
 
                 {/* ת.ז */}
-                <td className="p-2">{req.id}</td>
+                <td className="p-2">{req.userSnapshot?.nationalId}</td>
 
                 {/* שם */}
-                <td>{req.studentName}</td>
+                <td>{req.userSnapshot?.firstName} {req.userSnapshot?.lastName}</td>
 
                 {/* עיר */}
-                <td>{req.city}</td>
+                <td>{req.personal?.city}</td>
 
                 {/* תאריך */}
                 <td>
@@ -179,12 +194,12 @@ const AdminRequests = () => {
 
                 {/* כפתור */}
                 <td>
-                  {/* <button
-                    onClick={handleFilter}
-                    className="bg-[#071325] hover:bg-[#0d2544] text-white text-sm font-medium px-8 py-2.5 rounded-xl transition"
+                  <button
+                    onClick={() => navigate(`/admin-request-details/${req._id}`)}
+                    className="bg-[#071325] hover:bg-[#0d2544] text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
                   >
-                    סנן תוצאות
-                  </button> */}
+                    צפייה בבקשה
+                  </button>
                 </td>
 
               </tr>
