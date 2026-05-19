@@ -6,10 +6,10 @@ import Register from "../Register"
 import AdminRequests from "../admin-requests.jsx"
 import AdminRequestDetails from "../AdminRequestDetails"
 import Navbar from "./NavBar"
-
-// 1. מחקנו את הייבוא הישיר של FromStepTwo
-// 2. הבאנו במקומו את קומפוננטת המעטפת שלך (שימי לב לנתיב הקובץ)
 import HeadSteps from "../HeadSteps" 
+
+// 1. מייבאים את קומפוננטת הסטטוס (שימי לב שהשם הפיזי של הקובץ הוא statusRequest (2))
+import ScholarshipStatus from "../statusRequest (2)"
 
 export const Router = () => {
     return (
@@ -18,12 +18,15 @@ export const Router = () => {
                 <Navbar />
                 <Routes>
                     <Route path="/" element={<MainComponent />} />
-                 <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/admin-requests" element={<AdminRequests />} />
                     <Route path="/admin-request-details/:id" element={<AdminRequestDetails />} />
                     
                     {/* 3. שינינו את הנתיב כך שיפעיל את המעטפת */}
                     <Route path="/HeadSteps" element={<HeadSteps />} />
+                    
+                    {/* 2. הוספת הנתיב החדש עבור עמוד הסטטוס */}
+                    <Route path="/request-status" element={<ScholarshipStatus />} />
                     
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
