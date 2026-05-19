@@ -1,64 +1,73 @@
-import User from "../models/User.js"; // ייבוא המודל של המשתמש
-import bcrypt from "bcryptjs"; // ספריה להצפנת סיסמאות
-import jwt from "jsonwebtoken"; // ליצירת טוקן אבטחה
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-// הרשמה
-export const register = async (req, res) => {
+// לוגיקת הרשמה
+const register = async (req, res) => {
   try {
-    const { firstName, lastName, idNumber, password, email } = req.body;
+    const { firstName, lastName, idNumber, email, password } = req.body;
 
-    // 1. בדיקה אם המשתמש כבר קיים במערכת לפי תעודת זהות או מייל
+    // 1. בדיקה אם המשתמש כבר קיים
     const existingUser = await User.findOne({ $or: [{ idNumber }, { email }] });
     if (existingUser) {
       return res.status(400).json({ error: "משתמש עם פרטים אלו כבר קיים במערכת" });
     }
 
-    // 2. הצפנת הסיסמה
+    // 2. הצפנת הסיסמה לקולקשיין
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 3. יצירת משתמש חדש ושמירתו
+    // 3. יצירת המשתמש החדש
     const newUser = new User({
       firstName,
       lastName,
       idNumber,
       email,
-      password: hashedPassword,
+      password: hashedPassword
     });
 
     await newUser.save();
-    res.status(201).json({ message: "ההרשמה בוצעה בהצלחה!" });
+    res.status(201).json({ message: "המשתמש נרשם בהצלחה" });
   } catch (error) {
-    res.status(500).json({ error: "שגיאה בשרת בעת הניסיון להירשם" });
+    console.error(error);
+    res.status(500).json({ error: "שגיאת שרת בתהליך ההרשמה" });
   }
 };
 
-// התחברות
-export const login = async (req, res) => {
+// לוגיקת התחברות
+const login = async (req, res) => {
   try {
     const { idNumber, password } = req.body;
 
     // 1. חיפוש המשתמש לפי תעודת זהות
     const user = await User.findOne({ idNumber });
     if (!user) {
-      return res.status(400).json({ error: "מספר זהות או סיסמה שגויים" });
+      return res.status(400).json({ error: "תעודת זהות או סיסמה שגויים" });
     }
 
-    // 2. השוואת הסיסמה המוזנת לסיסמה המוצפנת בבסיס הנתונים
+    // 2. בדיקת התאמת סיסמה
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "מספר זהות או סיסמה שגויים" });
+      return res.status(400).json({ error: "תעודת זהות או סיסמה שגויים" });
     }
 
-    // 3. יצירת טוקן (JWT) לכניסה מאובטחת
-    const token = jwt.sign({ id: user._id }, "your_secret_key", { expiresIn: "1h" });
+    // 3. יצירת טוקן אבטחה JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secretkey", { expiresIn: "1h" });
 
     res.status(200).json({
       message: "התחברת בהצלחה",
       token,
-      user: { name: user.firstName + " " + user.lastName }
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email
+      }
     });
   } catch (error) {
-    res.status(500).json({ error: "שגיאה בשרת בעת הניסיון להתחבר" });
+    console.error(error);
+    res.status(500).json({ error: "שגיאת שרת בתהליך ההתחברות" });
   }
 };
+
+module.exports = { register, login };
