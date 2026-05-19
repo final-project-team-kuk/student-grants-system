@@ -4,11 +4,13 @@ import { useSearchParams } from 'react-router-dom';
 // ייבוא הקומפוננטות המוכנות בלבד
 import FromStepTwo from './FromStepTwo'; 
 import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
+import Step3Studies from './Step3Studies';
 import { FormStep5 } from './FormStep5';
 
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = Number(searchParams.get('step')) || 1;
+  const [requestId, setRequestId] = useState(null);
 
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד, כדי ששום דבר לא ייאבד במעברים
   const [formData, setFormData] = useState({
