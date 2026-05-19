@@ -121,6 +121,7 @@ export default function FromStepTwo({ nextStep, prevStep, formData, setFormData,
                   placeholder="0"
                   className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblingsUnder18 ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
                   {...register("siblingsUnder18", { required: "שדה חובה", min: { value: 0, message: "לא יכול להיות שלילי" } })}
+                  
                 />
                 {errors.siblingsUnder18 && <p className="text-red-500 text-xs mt-1">{errors.siblingsUnder18.message}</p>}
               </div>
@@ -145,7 +146,7 @@ export default function FromStepTwo({ nextStep, prevStep, formData, setFormData,
                   </div>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm text-[#071325] mb-2">מספר זהות</label>
+                      <label className="block text-sm text-[#071325] mb-2">מספר זהות <span className="text-red-500">*</span></label>
                       <input 
                         type="text" 
                         placeholder="הזן מספר זהות" 
@@ -158,30 +159,33 @@ export default function FromStepTwo({ nextStep, prevStep, formData, setFormData,
                       {errors.siblings?.[index]?.idNumber && <p className="text-red-500 text-xs mt-1">{errors.siblings[index].idNumber.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[#071325] mb-2">תאריך לידה</label>
+                      <label className="block text-sm text-[#071325] mb-2">תאריך לידה <span className="text-red-500">*</span></label>
                       <input 
                         type="date" 
-                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] ${errors.siblings?.[index]?.birthDate ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
                         {...register(`siblings.${index}.birthDate`, { required: "יש להזין תאריך לידה" })}
                       />
+                      {errors.siblings?.[index]?.birthDate && <p className="text-red-500 text-xs mt-1">{errors.siblings[index].birthDate.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[#071325] mb-2">שם משפחה</label>
+                      <label className="block text-sm text-[#071325] mb-2">שם משפחה <span className="text-red-500">*</span></label>
                       <input 
                         type="text" 
                         placeholder="הזן שם משפחה" 
-                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblings?.[index]?.lastName ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
                         {...register(`siblings.${index}.lastName`, { required: "יש להזין שם משפחה" })}
                       />
+                      {errors.siblings?.[index]?.lastName && <p className="text-red-500 text-xs mt-1">{errors.siblings[index].lastName.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[#071325] mb-2">שם פרטי</label>
+                      <label className="block text-sm text-[#071325] mb-2">שם פרטי <span className="text-red-500">*</span></label>
                       <input 
                         type="text" 
                         placeholder="הזן שם פרטי" 
-                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblings?.[index]?.firstName ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
                         {...register(`siblings.${index}.firstName`, { required: "יש להזין שם פרטי" })}
                       />
+                      {errors.siblings?.[index]?.firstName && <p className="text-red-500 text-xs mt-1">{errors.siblings[index].firstName.message}</p>}
                     </div>
                   </div>
                 </div>
@@ -211,7 +215,6 @@ export default function FromStepTwo({ nextStep, prevStep, formData, setFormData,
           <span>הקודם</span>
         </button>
 
-        {/* קורא לפונקציה המקומית שמדברת עם האבא */}
         <button
           type="button"
           onClick={handleLocalSaveDraft}
