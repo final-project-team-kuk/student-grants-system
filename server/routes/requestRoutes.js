@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getAllRequests, getRequestById, updateRequestStatus, updateRequestEducation } = require('../controllers/requestController');
+const { create, read, readOne, update, updateStatus, updateEducation, remove, getRequestStatus } = require('../controllers/requestController');
 
-router.get('/requests', getAllRequests);
-router.get('/requests/:id', getRequestById);
-router.patch('/requests/:id/status', updateRequestStatus);
-router.patch('/requests/:id/education', updateRequestEducation);
+router.post('/', create);
+router.get('/', read);
+router.get('/:id', readOne);
+router.put('/:id', update);
+router.patch('/:id/status', updateStatus);
+router.patch('/:id/education', updateEducation);
+router.delete('/:id', remove);
+router.get('/user/:userId', getRequestStatus);
 
 module.exports = router;
