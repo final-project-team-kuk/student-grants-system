@@ -1,9 +1,9 @@
 import React from 'react';
-import { useForm } from 'react-hook-form'; // הייבוא של הספרייה החדשה
+import { useForm, useFieldArray } from 'react-hook-form';
 
-export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
+// שימי לב שהוספנו כאן את setFormData שאנחנו צריכים לקבל מהאבא
+export default function FromStepTwo({ nextStep, prevStep, formData, setFormData, saveDraft }) {
   
-  // בדיקה שהתעודת זהות תקינה (לחבר לא חובר עדיין) 
   const isValidTZ = (id) => {
     if (!/^\d{9}$/.test(id)) return false;
     return Array.from(id, Number).reduce((acc, val, i) => {
@@ -12,21 +12,45 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
     }, 0) % 10 === 0;
   };
 
-  // הפעלת Hook Form
   const {
-    register, // פונקציה ש"רושמת" את השדות למערכת המעקב
-    handleSubmit, // פונקציה שעוטפת את פעולת השליחה ובודקת שהכל תקין
-    formState: { errors } // אובייקט שמכיל את כל השגיאות, אם יש
-  } = useForm();
+    register,
+    control,
+    handleSubmit,
+    getValues,
+    formState: { errors }
+  } = useForm({
+    // טוען את הנתונים מתוך המחברת הגלובלית (formData) במידה ויש
+    defaultValues: {
+      fatherId: formData.fatherId || "",
+      fatherLastName: formData.fatherLastName || "",
+      fatherFirstName: formData.fatherFirstName || "",
+      siblingsUnder18: formData.siblingsUnder18 || "",
+      siblingsOver21: formData.siblingsOver21 || "",
+      siblings: formData.siblings && formData.siblings.length > 0 
+        ? formData.siblings 
+        : [{ idNumber: "", birthDate: "", lastName: "", firstName: "" }]
+    }
+  });
 
-  // הפונקציה שתרוץ *רק* אם כל הבדיקות עברו בהצלחה
+  const { fields, append } = useFieldArray({
+    control,
+    name: "siblings"
+  });
+
+  // כשהמשתמש לוחץ על שמירת טיוטה מדף זה
+  const handleLocalSaveDraft = () => {
+    const currentData = getValues(); // שולף הכל מהמחברת המקומית
+    saveDraft(currentData); // שולח לאבא שישמור יחד עם שאר הדברים
+  };
+
+  // כשהמשתמש לוחץ 'הבא' ועובר את כל הבדיקות
   const onValidSubmit = (data) => {
-    console.log("הנתונים תקינים:", data); // כאן תוכלי בהמשך לשמור את הנתונים
-    nextStep(); // עוברים לשלב הבא!
+    // קודם כל מעדכנים את המחברת של האבא
+    setFormData(prev => ({ ...prev, ...data }));
+    nextStep(); // ואז עוברים שלב
   };
 
   return (
-    /* 🌟 כאן מתחיל העיצוב החדש והנקי: רק הקופסה הלבנה של הטופס! */
     <div className="bg-white border border-[#e2dfd8] rounded-2xl relative overflow-hidden shadow-sm" dir="rtl">
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full pointer-events-none"></div>
 
@@ -43,12 +67,11 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
+          {/* חלק 1: פרטי האב */}
           <div>
             <h3 className="text-[#071325] text-sm font-medium mb-4 pb-2 border-b border-[#d5c9b5]">פרטי האב</h3>
             <div className="grid md:grid-cols-2 gap-6">
-              
-              {/* שדה תעודת זהות */}
               <div>
                 <label className="block text-sm text-[#071325] mb-2">מספר זהות <span className="text-red-500">*</span></label>
                 <input 
@@ -63,7 +86,6 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
                 {errors.fatherId && <p className="text-red-500 text-xs mt-1">{errors.fatherId.message}</p>}
               </div>
 
-              {/* שדה שם משפחה */}
               <div>
                 <label className="block text-sm text-[#071325] mb-2">שם משפחה <span className="text-red-500">*</span></label>
                 <input 
@@ -75,7 +97,6 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
                 {errors.fatherLastName && <p className="text-red-500 text-xs mt-1">{errors.fatherLastName.message}</p>}
               </div>
 
-              {/* שדה שם פרטי */}
               <div className="md:col-span-2">
                 <label className="block text-sm text-[#071325] mb-2">שם פרטי <span className="text-red-500">*</span></label>
                 <input 
@@ -86,31 +107,125 @@ export default function FromStepTwo({ nextStep, prevStep, currentStep }) {
                 />
                 {errors.fatherFirstName && <p className="text-red-500 text-xs mt-1">{errors.fatherFirstName.message}</p>}
               </div>
-
             </div>
+          </div>
+
+          {/* חלק 2: פרטי אחים ואחיות */}
+          <div>
+            <h3 className="text-[#071325] text-sm font-medium mb-4 pb-2 border-b border-[#d5c9b5]">פרטי אחים</h3>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label className="block text-sm text-[#071325] mb-2">מספר אחים מתחת לגיל 18 <span className="text-red-500">*</span></label>
+                <input 
+                  type="number"
+                  placeholder="0"
+                  className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblingsUnder18 ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
+                  {...register("siblingsUnder18", { required: "שדה חובה", min: { value: 0, message: "לא יכול להיות שלילי" } })}
+                />
+                {errors.siblingsUnder18 && <p className="text-red-500 text-xs mt-1">{errors.siblingsUnder18.message}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm text-[#071325] mb-2">מספר אחים מעל גיל 21 <span className="text-red-500">*</span></label>
+                <input 
+                  type="number" 
+                  placeholder="0"
+                  className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblingsOver21 ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
+                  {...register("siblingsOver21", { required: "שדה חובה", min: { value: 0, message: "לא יכול להיות שלילי" } })}
+                />
+                {errors.siblingsOver21 && <p className="text-red-500 text-xs mt-1">{errors.siblingsOver21.message}</p>}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {fields.map((item, index) => (
+                <div key={item.id} className="p-6 border border-[#d5c9b5] rounded-xl bg-gray-50/30">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-[#071325] font-bold text-sm">אח / אחות #{index + 1}</h4>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm text-[#071325] mb-2">מספר זהות</label>
+                      <input 
+                        type="text" 
+                        placeholder="הזן מספר זהות" 
+                        className={`w-full bg-white border rounded-lg px-4 py-3 focus:outline-none transition text-sm text-[#071325] placeholder-[#071325]/50 ${errors.siblings?.[index]?.idNumber ? 'border-red-500 focus:border-red-500' : 'border-[#d5c9b5] focus:border-[#071325]'}`}
+                        {...register(`siblings.${index}.idNumber`, {
+                          validate: value => !value || isValidTZ(value) || "תעודת זהות אינה תקינה",
+                          required: "יש להזין מספר זהות"
+                        })}
+                      />
+                      {errors.siblings?.[index]?.idNumber && <p className="text-red-500 text-xs mt-1">{errors.siblings[index].idNumber.message}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm text-[#071325] mb-2">תאריך לידה</label>
+                      <input 
+                        type="date" 
+                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        {...register(`siblings.${index}.birthDate`, { required: "יש להזין תאריך לידה" })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-[#071325] mb-2">שם משפחה</label>
+                      <input 
+                        type="text" 
+                        placeholder="הזן שם משפחה" 
+                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        {...register(`siblings.${index}.lastName`, { required: "יש להזין שם משפחה" })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-[#071325] mb-2">שם פרטי</label>
+                      <input 
+                        type="text" 
+                        placeholder="הזן שם פרטי" 
+                        className="w-full bg-white border border-[#d5c9b5] rounded-lg px-4 py-3 focus:outline-none focus:border-[#071325]"
+                        {...register(`siblings.${index}.firstName`, { required: "יש להזין שם פרטי" })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => append({ idNumber: "", birthDate: "", lastName: "", firstName: "" })}
+              className="mt-6 w-full py-3.5 border-2 border-dashed border-[#d5c9b5] rounded-xl text-[#071325] font-medium hover:bg-[#071325]/5 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>+ הוסף אח / אחות</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* כפתורי הניווט בתחתית הקופסה */}
       <div className="bg-gray-50 border-t border-[#e2dfd8] px-8 py-6 flex items-center justify-between mt-4 rounded-b-2xl">
         <button
           onClick={prevStep}
           type="button"
-          className="flex items-center gap-2 px-6 py-2.5 text-[#071325] font-medium border-2 border-[#071325] rounded-xl hover:bg-[#071325] hover:text-white transition-all duration-200 cursor-pointer"
+          className="flex items-center gap-2 px-6 py-2.5 text-[#071325] font-medium border-2 border-[#071325] rounded-xl hover:bg-[#071325] hover:text-white transition-all duration-200"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <span>חזור לשלב הקודם</span>
+          <span>הקודם</span>
+        </button>
+
+        {/* קורא לפונקציה המקומית שמדברת עם האבא */}
+        <button
+          type="button"
+          onClick={handleLocalSaveDraft}
+          className="px-6 py-2.5 text-[#071325] font-medium border border-[#d5c9b5] rounded-xl hover:bg-[#071325]/5 transition-all duration-200 hidden md:block"
+        >
+          שמור טיוטה
         </button>
 
         <button
           onClick={handleSubmit(onValidSubmit)}
           type="button"
-          className="flex items-center gap-2 px-8 py-2.5 bg-[#071325] text-white font-medium rounded-xl hover:bg-[#071325]/80 shadow-lg shadow-[#071325]/20 transition-all duration-200 cursor-pointer"
+          className="flex items-center gap-2 px-8 py-2.5 bg-[#071325] text-white font-medium rounded-xl hover:bg-[#071325]/80 shadow-lg shadow-[#071325]/20 transition-all duration-200"
         >
-          <span>המשך לשלב הבא</span>
+          <span>הבא</span>
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
