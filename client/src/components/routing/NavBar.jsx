@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+
 export default function Navbar() {
   const navigate = useNavigate();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
+  
+  const [firstName, setFirstName] = useState('');
+  
   useEffect(() => {
+    // 1. טעינת שם המשתמש מהזיכרון
+    const storedName = localStorage.getItem('userFirstName');
+    if (storedName) {
+      setFirstName(storedName);
+    }
+
+    // 2. טיפול בלחיצה מחוץ לתפריט הנפתח
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowLoginDropdown(false);
@@ -13,13 +23,17 @@ export default function Navbar() {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    
+    // ניקוי האירוע כשהקומפוננטה יורדת מהמסך
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleLogout = () => {
-    // Add logout logic here if needed
+    localStorage.removeItem('userFirstName');
+    setFirstName(''); 
     navigate('/');
   };
+
   return (
     <nav className="flex items-center justify-between p-4 border-b border-[#122843]/50 bg-[#071325]">
       {/* צד ימין - לוגו */}
@@ -44,8 +58,7 @@ export default function Navbar() {
             }`
           }
         >
-      
-    דף הבית
+          דף הבית
         </NavLink>
         <NavLink 
           to="/register"
@@ -70,6 +83,7 @@ export default function Navbar() {
           >
             התחברות
           </button>
+          
           {showLoginDropdown && (
             <div className="absolute top-full mt-2 right-0 bg-[#071325] border border-[#122843]/50 rounded-lg shadow-lg py-2 min-w-[200px] z-50">
               <NavLink
@@ -89,16 +103,22 @@ export default function Navbar() {
             </div>
           )}
         </div>
+        
+        {/* כפתור היציאה */}
         <button
           onClick={handleLogout}
           className="text-sm bg-[#0d2544] hover:bg-[#163a71] text-white px-4 py-1.5 rounded-lg border border-[#1f4ea8] transition"
         >
           יציאה
         </button>
+        
+        {/* אזור תצוגת השם */}
         <div className="flex items-center gap-3 bg-[#0d2544]/70 px-3 py-1.5 rounded-full border border-[#1f4ea8]">
-          <span className="text-sm font-medium text-white">ישראל כהן</span>
+          <span className="text-sm font-medium text-white">
+            {firstName ? firstName : 'אורח'}
+          </span>
           <div className="bg-[#1f4ea8] text-white text-xs font-bold w-7 h-7 flex items-center justify-center rounded-full">
-            יכ
+            {firstName ? firstName.charAt(0) : 'א'}
           </div>
         </div>
       </div>

@@ -42,6 +42,7 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem('userFirstName', data.user.firstName);
         Swal.fire({
           icon: 'success',
           title: `ברוך הבא, ${data.user.firstName}!`,
