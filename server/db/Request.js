@@ -96,4 +96,7 @@ const requestSchema = new mongoose.Schema({
   }
  
 });
-module.exports = mongoose.model("Request", requestSchema);
+// מחפשים אם המודל כבר קיים ב-models, אם לא - יוצרים אותו
+const Request = mongoose.models.Request || mongoose.model('Request', RequestSchema);
+module.exports = Request;
+// module.exports = mongoose.model("Request", requestSchema);
