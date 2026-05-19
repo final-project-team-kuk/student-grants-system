@@ -1,40 +1,45 @@
-import User from "../models/User.js"; // ייבוא המודל של המשתמש
-import bcrypt from "bcryptjs"; // ספריה להצפנת סיסמאות
-import jwt from "jsonwebtoken"; // ליצירת טוקן אבטחה
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // הרשמה
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { firstName, lastName, idNumber, password, email } = req.body;
 
-    // 1. בדיקה אם המשתמש כבר קיים במערכת לפי תעודת זהות או מייל
-    const existingUser = await User.findOne({ $or: [{ idNumber }, { email }] });
-    if (existingUser) {
-      return res.status(400).json({ error: "משתמש עם פרטים אלו כבר קיים במערכת" });
+    // 1. בדיקה בפרטי חובה
+    if (!firstName || !lastName || !idNumber || !password) {
+      return res.status(400).json({ error: "דרוש יד עבר שם, משפחה, מספר זהוית וסיסמה." });
     }
 
-    // 2. הצפנת הסיסמה
+    // 2. בדיקה אם המשתמש כבר קיים במערכת לפי תעודת זהוית
+    const existingUser = await User.findOne({ idNumber });
+    if (existingUser) {
+      return res.status(400).json({ error: "מספר זהוית זה כבר קיים במערכת" });
+    }
+
+    // 3. הצפנת הסיסמה
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 3. יצירת משתמש חדש ושמירתו
+    // 4. יצירת משתמש חדש ושמירתו
     const newUser = new User({
       firstName,
       lastName,
       idNumber,
-      email,
+      email: email || null,
       password: hashedPassword,
     });
 
     await newUser.save();
-    res.status(201).json({ message: "ההרשמה בוצעה בהצלחה!" });
+    res.status(201).json({ message: "ההרשמה בוצשה בהצלחה! עכשיו יכולים להיכנס." });
   } catch (error) {
     res.status(500).json({ error: "שגיאה בשרת בעת הניסיון להירשם" });
   }
 };
 
 // התחברות
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { idNumber, password } = req.body;
 
@@ -51,7 +56,7 @@ export const login = async (req, res) => {
     }
 
     // 3. יצירת טוקן (JWT) לכניסה מאובטחת
-    const token = jwt.sign({ id: user._id }, "your_secret_key", { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.status(200).json({
       message: "התחברת בהצלחה",
@@ -62,3 +67,5 @@ export const login = async (req, res) => {
     res.status(500).json({ error: "שגיאה בשרת בעת הניסיון להתחבר" });
   }
 };
+
+module.exports = { register, login };

@@ -1,37 +1,31 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { MainComponent } from "../MainComponent"
-import Dashboard from "../Dashboard"
-import Login from "../Login"
-import Register from "../Register"
-import AdminRequests from "../admin-requests.jsx"
-import AdminRequestDetails from "../AdminRequestDetails"
-import Navbar from "./NavBar"
-import HeadSteps from "../HeadSteps" 
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { MainComponent } from "../MainComponent";
+import Dashboard from "../Dashboard";
+import FromStepTwo from "../FromStepTwo";
+import Login from "../Login";
+import Register from "../Register";
+import Navbar from "./NavBar";
+import ScholarshipStatus from "../statusRequest (2).jsx";
+  import HeaderSteps from "../HeadSteps";
 
-// 1. מייבאים את קומפוננטת הסטטוס (שימי לב שהשם הפיזי של הקובץ הוא statusRequest (2))
-import ScholarshipStatus from "../statusRequest (2)"
+const RequireAuth = ({ auth, children }) => {
+  return auth?.user ? children : <Navigate to="/login" replace />;
+};
 
-export const Router = () => {
-    return (
-        <>
-            <BrowserRouter>
-                <Navbar />
-                <Routes>
-                    <Route path="/" element={<MainComponent />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/admin-requests" element={<AdminRequests />} />
-                    <Route path="/admin-request-details/:id" element={<AdminRequestDetails />} />
-                    
-                    {/* 3. שינינו את הנתיב כך שיפעיל את המעטפת */}
-                    <Route path="/HeadSteps" element={<HeadSteps />} />
-                    
-                    {/* 2. הוספת הנתיב החדש עבור עמוד הסטטוס */}
-                    <Route path="/request-status" element={<ScholarshipStatus />} />
-                    
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                </Routes>
-            </BrowserRouter>
-        </>
-    )
-}
+export const Router = ({ auth }) => {
+  return (
+    <BrowserRouter>
+      <Navbar auth={auth} />
+      <Routes>
+        <Route path="/" element={<MainComponent />} />
+        <Route path="/dashboard" element={<RequireAuth auth={auth}><Dashboard /></RequireAuth>} />
+        <Route path="/request-status" element={<RequireAuth auth={auth}><ScholarshipStatus /></RequireAuth>} />
+        <Route path="/from-step-two" element={<RequireAuth auth={auth}><FromStepTwo /></RequireAuth>} />
+        <Route path="/login" element={<Login auth={auth} />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/HeadSteps" element={<RequireAuth auth={auth}><HeaderSteps /></RequireAuth>} />
+      </Routes>
+    </BrowserRouter>
+  );
+};

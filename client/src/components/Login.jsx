@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const gradCap = (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
@@ -6,112 +7,91 @@ const gradCap = (
   </svg>
 );
 
-export default function Register({ onSwitchToLogin }) {
-  const [activeTab, setActiveTab] = useState("register");
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    idNumber: "",
-    password: "",
-    confirmPassword: "",
-  });
+export default function Login({ auth }) {
+  const [form, setForm] = useState({ idNumber: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-const handleSubmit = async () => {
-  setIsLoading(true);
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+  const handleSubmit = async () => {
+    setError("");
+    setIsLoading(true);
 
-    if (response.ok) {
-      alert("נרשמת בהצלחה!");
-      onSwitchToLogin();
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || "שגיאה בהתחברות, נסה שוב.");
+        return;
+      }
+
+      auth?.login?.(data.user, data.token);
+      navigate("/dashboard");
+    } catch (fetchError) {
+      setError("שגיאה ברשת. אנא נסה שוב מאוחר יותר.");
+      console.error(fetchError);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("שגיאה ברישום:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-  const fields = [
-    { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
-    { key: "lastName",        label: "שם משפחה",      placeholder: "הזן שם משפחה",     type: "text"     },
-    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
-    { key: "password",        label: "סיסמה",         placeholder: "בחר סיסמה",        type: "password" },
-    { key: "confirmPassword", label: "אימות סיסמה",   placeholder: "הזן סיסמה שוב",   type: "password" },
-  ];
+  };
 
   return (
     <div style={styles.root}>
-      {/* כתמים בולטים יותר ברקע */}
       <div style={styles.blob1} />
       <div style={styles.blob2} />
 
       <div style={styles.container}>
-        {/* Logo */}
         <div style={styles.logoWrap}>
           <div style={styles.logoIcon}>{gradCap}</div>
         </div>
+        <h1 style={styles.title}>התחברות למערכת</h1>
+        <p style={styles.subtitle}>הזן מספר זהות וסיסמה כדי להיכנס ולעקוב אחרי בקשות המענק שלך.</p>
 
-        {/* Title */}
-        <h1 style={styles.title}>מערכת מענקים לסטודנטים</h1>
-        <p style={styles.subtitle}>ניהול בקשות מענק אקדמי</p>
-
-        {/* Card */}
         <div style={styles.card}>
-          {/* Tabs */}
-          <div style={styles.tabRow}>
-            <button
-              style={{ ...styles.tab, ...(activeTab === "register" ? styles.tabActive : styles.tabInactive) }}
-              onClick={() => setActiveTab("register")}
-            >
-              הרשמה
-            </button>
-            <button
-              style={{ ...styles.tab, ...(activeTab === "login" ? styles.tabActive : styles.tabInactive) }}
-              onClick={() => { setActiveTab("login"); onSwitchToLogin?.(); }}
-            >
-              כניסה למערכת
-            </button>
+          {error && <div style={styles.error}>{error}</div>}
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>מספר זהות</label>
+            <input
+              style={styles.input}
+              type="text"
+              value={form.idNumber}
+              onChange={handleChange("idNumber")}
+              placeholder="הזן מספר זהות"
+              dir="rtl"
+            />
           </div>
 
-          {/* Fields */}
-          {fields.map(({ key, label, placeholder, type }) => (
-            <div key={key} style={styles.fieldGroup}>
-              <label style={styles.label}>{label}</label>
-              <input
-                style={styles.input}
-                type={type}
-                value={form[key]}
-                onChange={handleChange(key)}
-                placeholder={placeholder}
-                dir="rtl"
-              />
-            </div>
-          ))}
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>סיסמה</label>
+            <input
+              style={styles.input}
+              type="password"
+              value={form.password}
+              onChange={handleChange("password")}
+              placeholder="הזן סיסמה"
+              dir="rtl"
+            />
+          </div>
 
-          {/* Submit */}
           <button
             style={{ ...styles.submitBtn, ...(isLoading ? styles.submitBtnLoading : {}) }}
             onClick={handleSubmit}
             disabled={isLoading}
           >
-            {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
+            {isLoading ? "מתחבר..." : "התחבר"}
           </button>
 
-          {/* Footer */}
           <p style={styles.footerText}>
-            כבר יש לך חשבון?{" "}
-            <span style={styles.footerLink} onClick={() => onSwitchToLogin?.()}>
-              כניסה למערכת
-            </span>
+            עדיין לא רשום? <Link style={styles.footerLink} to="/register">יצירת חשבון</Link>
           </p>
         </div>
       </div>
@@ -222,32 +202,15 @@ const styles = {
     gap: 18,
     boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
   },
-  tabRow: {
-    display: "flex",
-    borderRadius: 12,
-    background: "#E5E0D5",
-    padding: 4,
-    gap: 4,
-  },
-  tab: {
-    flex: 1,
-    padding: "10px 0",
-    borderRadius: 9,
-    border: "none",
-    cursor: "pointer",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    fontWeight: 600,
-    transition: "all 0.22s ease",
-  },
-  tabActive: {
-    background: "#0A192F",
-    color: "#F5F1E9",
-    boxShadow: "0 4px 14px rgba(10,25,47,0.2)",
-  },
-  tabInactive: {
-    background: "transparent",
-    color: "#5C6370",
+  error: {
+    padding: "14px 18px",
+    borderRadius: 14,
+    background: "#FEE2E2",
+    color: "#B91C1C",
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: "right",
+    width: "100%",
   },
   fieldGroup: {
     display: "flex",
@@ -299,9 +262,8 @@ const styles = {
   },
   footerLink: {
     color: "#0A192F",
-    cursor: "pointer",
-    fontWeight: 600,
     textDecoration: "underline",
     textUnderlineOffset: 2,
+    fontWeight: 600,
   },
 };
