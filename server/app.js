@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require("mongoose");
 const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
 const requestRoutes = require('./routes/requestRoutes');
@@ -7,8 +8,10 @@ const requestRoutes = require('./routes/requestRoutes');
 const authRoutes = require('./routes/authRoutes'); 
 
 require('dotenv').config();
-
 const app = express();
+app.use('/admin', adminRoutes);
+
+
 
 // Middleware
 app.use(cors());
@@ -21,7 +24,7 @@ connectDB();
 // 2. מחברים את הראוטים של ה-Auth לנתיב שהפרונטאנד מחפש (/api/auth)
 app.use('/api/auth', authRoutes); 
 app.use('/api', studentRoutes);
-app.use('/api/requests', requestRoutes);
+app.use('/api', requestRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
