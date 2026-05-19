@@ -1,10 +1,10 @@
-// server/routes/authRoutes.js
 const express = require("express");
-const { register, login } = require('../controllers/authController');
-
 const router = express.Router();
+const { register, login } = require("../controllers/authController");
+const registerValidation = require("../middleware/registerValidation");
+const loginValidation = require("../middleware/loginValidation");
 
-router.post('/register', register);
-router.post('/login', login);
+router.post("/register", registerValidation, register);
+router.post("/login", loginValidation, login);
 
 module.exports = router;
