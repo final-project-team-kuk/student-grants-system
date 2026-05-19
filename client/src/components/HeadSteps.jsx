@@ -3,11 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 
 // ייבוא הקומפוננטות המוכנות בלבד
 import FromStepTwo from './FromStepTwo'; 
-import FromStepFour from './FromStepFour';
+import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
+import Step3Studies from './Step3Studies';
+import { FormStep5 } from './FormStep5';
 
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = Number(searchParams.get('step')) || 1;
+  const [requestId, setRequestId] = useState(null);
 
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד
   const [formData, setFormData] = useState({
@@ -74,6 +77,7 @@ export default function HeaderSteps() {
 
       case 3:
         return (
+<<<<<<< HEAD
           <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
             <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 3: פרטי לימודים</h2>
             <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
@@ -94,11 +98,18 @@ export default function HeaderSteps() {
             <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 5: העלאת קבצים</h2>
             <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
             <div className="flex justify-center gap-4">
-              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
-              <button onClick={() => handleSaveDraft()} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">שמור טיוטה</button>
               <button onClick={goToNextStep} className="px-6 py-2 bg-[#071325] text-white rounded-lg font-bold">דילוג לשלב הבא</button>
+              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
             </div>
           </div>
+=======
+         <Step3Studies
+          nextStep={goToNextStep}
+          prevStep={goToPrevStep}
+          currentStep={currentStep}
+          requestId={requestId}
+        />
+>>>>>>> 6abeb4dd3e9ba4dffed7ebab04e6921e8457cea4
         );
 
       case 6:
