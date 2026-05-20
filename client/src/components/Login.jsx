@@ -1,269 +1,120 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // ייבוא הספרייה
 
 const gradCap = (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18V17l7 4 7-4v-3.82L12 17l-7-3.82z"/>
   </svg>
 );
 
-export default function Login({ auth }) {
-  const [form, setForm] = useState({ idNumber: "", password: "" });
+export default function Login() {
+  const [idNumber, setIdNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    setError("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!idNumber.trim() || !password) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'חסרים פרטים',
+        text: 'נא למלא את כל השדות',
+        confirmButtonColor: '#0A192F'
+      });
+      return;
+    }
+
     setIsLoading(true);
-
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          idNumber: idNumber.trim(),
+          password: password,
+        }),
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || "שגיאה בהתחברות, נסה שוב.");
-        return;
-      }
 
-      auth?.login?.(data.user, data.token);
-      navigate("/dashboard");
-    } catch (fetchError) {
-      setError("שגיאה ברשת. אנא נסה שוב מאוחר יותר.");
-      console.error(fetchError);
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: `ברוך הבא, ${data.user.firstName}!`,
+          text: 'התחברת בהצלחה',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        navigate("/dashboard");
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה בהתחברות',
+          text: data.error || "אירעה שגיאה",
+          confirmButtonColor: '#d33'
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'תקלה בשרת',
+        text: 'שגיאה בתקשורת עם השרת, נסה שוב מאוחר יותר',
+        confirmButtonColor: '#d33'
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div style={styles.root}>
-      <div style={styles.blob1} />
-      <div style={styles.blob2} />
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap');
+        .login-page-container { font-family: 'Heebo', sans-serif !important; }
+        .login-page-container input, .login-page-container button, .login-page-container label { font-family: 'Heebo', sans-serif !important; }
+        .login-page-container input::placeholder { color: #A0AEC0; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
 
-      <div style={styles.container}>
-        <div style={styles.logoWrap}>
-          <div style={styles.logoIcon}>{gradCap}</div>
-        </div>
-        <h1 style={styles.title}>התחברות למערכת</h1>
-        <p style={styles.subtitle}>הזן מספר זהות וסיסמה כדי להיכנס ולעקוב אחרי בקשות המענק שלך.</p>
+      <div className="login-page-container min-h-screen bg-[#F2EDE4] flex flex-col items-center justify-start relative overflow-x-hidden pt-12 pb-12 px-4" style={{ direction: "rtl" }}>
+        <div className="flex flex-col items-center z-10 w-full max-w-[420px]" style={{ animation: "fadeUp 0.6s ease-out" }}>
+          <div className="w-[64px] h-[64px] rounded-[20px] bg-[#0A192F] flex items-center justify-center mb-4 shadow-xl">{gradCap}</div>
+          <h1 style={{ color: "#0A192F", fontSize: "26px", fontWeight: 800, marginBottom: "4px" }}>מערכת מענקים לסטודנטים</h1>
+          <p style={{ color: "#5C6370", fontSize: "14px", marginBottom: "24px" }}>ניהול בקשות מענק אקדמי</p>
 
-        <div style={styles.card}>
-          {error && <div style={styles.error}>{error}</div>}
+          <form onSubmit={handleLogin} className="w-full flex flex-col" style={{ background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(12px)", borderRadius: "24px", padding: "28px", gap: "20px", boxShadow: "0 20px 40px rgba(0,0,0,0.05)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>
+            
+            <div className="flex bg-[#E5E0D5] p-1 rounded-xl mb-2">
+              <button type="button" style={{ flex: 1, padding: "10px", borderRadius: "9px", border: "none", fontWeight: 800, background: "#0A192F", color: "#F5F1E9" }}>כניסה למערכת</button>
+              <button type="button" onClick={() => navigate("/register")} style={{ flex: 1, padding: "10px", borderRadius: "9px", border: "none", cursor: "pointer", fontWeight: 800, background: "transparent", color: "#5C6370" }}>הרשמה</button>
+            </div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>מספר זהות</label>
-            <input
-              style={styles.input}
-              type="text"
-              value={form.idNumber}
-              onChange={handleChange("idNumber")}
-              placeholder="הזן מספר זהות"
-              dir="rtl"
-            />
-          </div>
+            <div className="flex flex-col" style={{ gap: "6px" }}>
+              <label style={{ color: "#0A192F", fontSize: "13px", fontWeight: 700 }}>מספר זהות</label>
+              <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="הכנס מספר זהות" style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }} />
+            </div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>סיסמה</label>
-            <input
-              style={styles.input}
-              type="password"
-              value={form.password}
-              onChange={handleChange("password")}
-              placeholder="הזן סיסמה"
-              dir="rtl"
-            />
-          </div>
+            <div className="flex flex-col" style={{ gap: "6px" }}>
+              <label style={{ color: "#0A192F", fontSize: "13px", fontWeight: 700 }}>סיסמה</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="הכנס סיסמה" style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }} />
+            </div>
 
-          <button
-            style={{ ...styles.submitBtn, ...(isLoading ? styles.submitBtnLoading : {}) }}
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? "מתחבר..." : "התחבר"}
-          </button>
-
-          <p style={styles.footerText}>
-            עדיין לא רשום? <Link style={styles.footerLink} to="/register">יצירת חשבון</Link>
-          </p>
+            <button type="submit" disabled={isLoading} style={{ width: "100%", padding: "14px", borderRadius: "12px", border: "none", background: "#0A192F", color: "#F5F1E9", fontSize: "16px", fontWeight: 800, marginTop: "4px", cursor: isLoading ? "not-allowed" : "pointer" }}>
+              {isLoading ? "מתחבר..." : "כניסה למערכת"}
+            </button>
+            
+            <p style={{ color: "#5C6370", fontSize: "13px", textAlign: "center", marginTop: "4px" }}>
+              אין לך חשבון? <span onClick={() => navigate("/register")} style={{ color: "#0A192F", cursor: "pointer", fontWeight: 700, textDecoration: "underline" }}>צור אותו עכשיו...</span>
+            </p>
+          </form>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        input::placeholder { color: #A0AEC0; }
-        input:focus { outline: none; border-color: #0A192F !important; box-shadow: 0 0 0 3px rgba(10,25,47,0.15); }
-        button { transition: opacity 0.2s, transform 0.15s; }
-        button:hover:not(:disabled) { opacity: 0.92; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes blobFloat {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50%       { transform: translateY(-30px) scale(1.05); }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }
-
-const styles = {
-  root: {
-    minHeight: "100vh",
-    background: "#F2EDE4",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'Heebo', sans-serif",
-    direction: "rtl",
-    position: "relative",
-    overflow: "hidden",
-    padding: "40px 16px",
-  },
-  blob1: {
-    position: "fixed",
-    width: 580,
-    height: 580,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
-    top: "-120px",
-    left: "-100px",
-    filter: "blur(80px)",
-    animation: "blobFloat 8s ease-in-out infinite",
-    pointerEvents: "none",
-  },
-  blob2: {
-    position: "fixed",
-    width: 450,
-    height: 450,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
-    bottom: "-80px",
-    right: "-60px",
-    filter: "blur(70px)",
-    animation: "blobFloat 10s ease-in-out infinite reverse",
-    pointerEvents: "none",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "16px",
-    animation: "fadeUp 0.7s ease both",
-    zIndex: 1,
-    width: "100%",
-    maxWidth: 480,
-  },
-  logoWrap: { marginBottom: 4 },
-  logoIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    background: "#0A192F",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 8px 32px rgba(10,25,47,0.25)",
-  },
-  title: {
-    color: "#0A192F",
-    fontSize: 26,
-    fontWeight: 800,
-    letterSpacing: "-0.3px",
-    textAlign: "center",
-  },
-  subtitle: {
-    color: "#5C6370",
-    fontSize: 14,
-    fontWeight: 300,
-    textAlign: "center",
-    marginTop: -8,
-  },
-  card: {
-    marginTop: 8,
-    width: "100%",
-    background: "rgba(255, 255, 255, 0.7)",
-    backdropFilter: "blur(18px)",
-    WebkitBackdropFilter: "blur(18px)",
-    border: "1px solid rgba(10,25,47,0.1)",
-    borderRadius: 20,
-    padding: "28px 28px 24px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 18,
-    boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
-  },
-  error: {
-    padding: "14px 18px",
-    borderRadius: 14,
-    background: "#FEE2E2",
-    color: "#B91C1C",
-    fontSize: 14,
-    marginBottom: 12,
-    textAlign: "right",
-    width: "100%",
-  },
-  fieldGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 7,
-  },
-  label: {
-    color: "#0A192F",
-    fontSize: 14,
-    fontWeight: 500,
-    textAlign: "right",
-  },
-  input: {
-    background: "#ffffff",
-    border: "1px solid #D1D5DB",
-    borderRadius: 12,
-    padding: "13px 18px",
-    color: "#0A192F",
-    fontSize: 15,
-    fontFamily: "'Heebo', sans-serif",
-    textAlign: "right",
-    width: "100%",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  },
-  submitBtn: {
-    width: "100%",
-    padding: "15px",
-    borderRadius: 12,
-    border: "none",
-    background: "#0A192F",
-    color: "#F5F1E9",
-    fontSize: 16,
-    fontWeight: 700,
-    fontFamily: "'Heebo', sans-serif",
-    cursor: "pointer",
-    letterSpacing: "0.3px",
-    boxShadow: "0 6px 24px rgba(10,25,47,0.2)",
-    marginTop: 4,
-  },
-  submitBtnLoading: {
-    opacity: 0.7,
-    cursor: "not-allowed",
-  },
-  footerText: {
-    color: "#5C6370",
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: -4,
-  },
-  footerLink: {
-    color: "#0A192F",
-    textDecoration: "underline",
-    textUnderlineOffset: 2,
-    fontWeight: 600,
-  },
-};

@@ -1,22 +1,14 @@
-const express = require("express");
-const { Router } = express;
-const {
-  create,
-  read,
-  readOne,
-  update,
-  updateStatus,
-  remove
-} = require("../controllers/addRequestCrude");
+const express = require('express');
+const router = express.Router();
+const { create, read, readOne, update, updateStatus, updateEducation, remove, getRequestStatus } = require('../controllers/requestController');
 
-const router = Router();
-
-//  Method   Path                      Controller
-router.post  ("/",           create);        // create new request
-router.get   ("/",           read);          // get all (+ optional filters)
-router.get   ("/:id",        readOne);       // get one by id
-router.put   ("/:id",        update);        // update any fields
-router.patch ("/:id/status", updateStatus);  // change status only
-router.delete("/:id",        remove);        // delete
+router.post('/', create);
+router.get('/', read);
+router.get('/:id', readOne);
+router.put('/:id', update);
+router.patch('/:id/status', updateStatus);
+router.patch('/:id/education', updateEducation);
+router.delete('/:id', remove);
+router.get('/user/:userId', getRequestStatus);
 
 module.exports = router;

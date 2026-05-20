@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const gradCap = (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
@@ -8,148 +9,184 @@ const gradCap = (
 );
 
 export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     idNumber: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (field) => (e) =>
+  const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  const validateForm = () => {
+    const tempErrors = {};
+    const nameRegex = /^[a-zA-Zא-ת\s]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!form.firstName.trim()) tempErrors.firstName = "שם פרטי הוא שדה חובה";
+    else if (!nameRegex.test(form.firstName.trim())) tempErrors.firstName = "שם פרטי חייב להכיל אותיות בלבד";
+    else if (form.firstName.trim().length < 2) tempErrors.firstName = "שם פרטי חייב להכיל לפחות 2 אותיות";
+
+    if (!form.lastName.trim()) tempErrors.lastName = "שם משפחה הוא שדה חובה";
+    else if (!nameRegex.test(form.lastName.trim())) tempErrors.lastName = "שם משפחה חייב להכיל אותיות בלבד";
+    else if (form.lastName.trim().length < 2) tempErrors.lastName = "שם משפחה חייב להכיל לפחות 2 אותיות";
+    
+    // כאן השינוי היחיד שביקשת - בדיקה של בדיוק 9 ספרות
+    if (!form.idNumber.trim()) tempErrors.idNumber = "מספר זהות הוא שדה חובה";
+    else if (!/^\d{9}$/.test(form.idNumber.trim())) tempErrors.idNumber = "מספר זהות חייב להכיל בדיוק 9 ספרות";
+
+    if (!form.email.trim()) tempErrors.email = "כתובת אימייל היא שדה חובה";
+    else if (!emailRegex.test(form.email.trim())) tempErrors.email = "כתובת האימייל אינה תקינה";
+
+    if (!form.password) tempErrors.password = "סיסמה היא שדה חובה";
+    else if (form.password.length < 6) tempErrors.password = "הסיסמה חייבת להכיל לפחות 6 תווים";
+    else if (!/[a-zA-Zא-ת]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל לפחות אות אחת";
+    else if (!/[0-9]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל לפחות מספר אחד";
+    else if (!/[@$!%*?&_#^()-]/.test(form.password)) tempErrors.password = "הסיסמה חייבת להכיל סימן מיוחד";
+
+    if (form.password !== form.confirmPassword) tempErrors.confirmPassword = "הסיסמאות אינן תואמות";
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'טופס לא תקין',
+        text: 'נא לוודא שכל השדות מלאים לפי הדרישות',
+        confirmButtonColor: '#0A192F'
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Password confirmation check
-      if (form.password !== form.confirmPassword) {
-        setError("הסיסמות לא חופפות! אנא בדוק את הסיסמה שלך.");
-        return;
-      }
-
-      // Password length check
-      if (form.password.length < 6) {
-        setError("הסיסמה חייבת להיות על פחות 6 תווים.");
-        return;
-      }
-
-      setError("");
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: form.firstName,
-          lastName: form.lastName,
-          idNumber: form.idNumber,
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          idNumber: form.idNumber.trim(),
+          email: form.email.trim().toLowerCase(),
           password: form.password,
         }),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || "חדטה בתהליך. אנא נסה שוב.");
-        return;
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'נרשמת בהצלחה!',
+          text: 'החשבון נוצר, מעביר אותך לדף ההתחברות',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setForm({ firstName: "", lastName: "", idNumber: "", email: "", password: "", confirmPassword: "" });
+        navigate("/login");
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה ברישום',
+          text: data.error || "אירעה שגיאה בשרת",
+          confirmButtonColor: '#d33'
+        });
       }
-
-      setSuccess(true);
-      setForm({ firstName: "", lastName: "", idNumber: "", password: "", confirmPassword: "" });
-    } catch (error) {
-      setError("שגיאה ברשת. אנא נסה שוב.");
-      console.error("שגיאה ברישום:", error);
+    } catch (err) {
+      console.error("שגיאה ברישום:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'שגיאת תקשורת',
+        text: 'לא ניתן להתחבר לשרת כרגע',
+        confirmButtonColor: '#d33'
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const fields = [
-    { key: "firstName",       label: "שם פרטי",       placeholder: "הזן שם פרטי",      type: "text"     },
-    { key: "lastName",        label: "שם משפחה",      placeholder: "הזן שם משפחה",     type: "text"     },
-    { key: "idNumber",        label: "מספר זהות",     placeholder: "הזן מספר זהות",    type: "text"     },
-    { key: "password",        label: "סיסמה",         placeholder: "בחר סיסמה",        type: "password" },
-    { key: "confirmPassword", label: "אימות סיסמה",   placeholder: "הזן סיסמה שוב",   type: "password" },
+    { key: "firstName", label: "שם פרטי", placeholder: "הזן שם פרטי", type: "text" },
+    { key: "lastName", label: "שם משפחה", placeholder: "הזן שם משפחה", type: "text" },
+    { key: "idNumber", label: "מספר זהות", placeholder: "הזן מספר זהות", type: "text" },
+    { key: "email", label: "אימייל", placeholder: "הזן אימייל (באנגלית)", type: "email" },
+    { key: "password", label: "סיסמה", placeholder: "בחר סיסמה חזקה", type: "password" },
+    { key: "confirmPassword", label: "אימות סיסמה", placeholder: "הזן סיסמה שוב", type: "password" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E8E3D7] via-[#F9F7EF] to-[#E0E7F7] relative overflow-hidden" dir="rtl">
-      <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-[#1f4ea8]/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-16 right-0 h-96 w-96 rounded-full bg-[#071325]/10 blur-3xl" />
+    <div className="min-h-screen bg-[#F2EDE4] flex justify-center relative overflow-y-auto px-4 pt-10 pb-12 select-none font-['Heebo']" style={{ direction: "rtl" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md">
-          <div className="overflow-hidden rounded-[32px] border border-[#071325]/10 bg-white/85 shadow-[0_40px_120px_-65px_rgba(7,19,37,0.65)] backdrop-blur-xl">
-            <div className="p-8">
-              {/* Logo */}
-              <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-[#071325] flex items-center justify-center shadow-lg shadow-[#071325]/20">
-                  {gradCap}
-                </div>
-              </div>
+      <div className="fixed w-[580px] h-[580px] rounded-full -top-[120px] -left-[100px] blur-[80px] pointer-events-none bg-gradient-to-br from-[#0a192f]/18 to-transparent" />
+      <div className="fixed w-[450px] h-[450px] rounded-full -bottom-[80px] -right-[60px] blur-[70px] pointer-events-none bg-gradient-to-tl from-[#0a192f]/14 to-transparent" />
 
-              {/* Title */}
-              <h1 className="text-2xl font-bold text-center text-[#071325] mb-2">
-                הרשמה למערכת
-              </h1>
-              <p className="text-sm text-center text-[#64748b] mb-6">
-                צור חשבון חדש כדי להתחיל להגיש בקשות מענק
-              </p>
-
-              {/* Success Message */}
-              {success && (
-                <div className="mb-4 p-4 rounded-2xl bg-[#DBEAFE] text-[#1E40AF] text-sm text-right">
-                  ההרשמה בוצעה בהצלחה! כעת תוכל <Link to="/login" className="font-semibold underline">להתחבר למערכת</Link>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <div className="mb-4 p-4 rounded-2xl bg-[#FEE2E2] text-[#B91C1C] text-sm text-right">
-                  {error}
-                </div>
-              )}
-
-              {/* Form Fields */}
-              <div className="space-y-4">
-                {fields.map(({ key, label, placeholder, type }) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-[#071325] text-right mb-2">
-                      {label}
-                    </label>
-                    <input
-                      className="w-full px-4 py-3 border border-[#D1D5DB] rounded-xl bg-white text-[#071325] text-right placeholder-[#A0AEC0] focus:outline-none focus:ring-2 focus:ring-[#071325]/20 focus:border-[#071325] transition-colors"
-                      type={type}
-                      value={form[key]}
-                      onChange={handleChange(key)}
-                      placeholder={placeholder}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Submit Button */}
-              <button
-                className="w-full mt-6 px-6 py-3 bg-[#071325] text-white font-semibold rounded-xl shadow-lg shadow-[#071325]/20 hover:bg-[#0b294c] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                onClick={handleSubmit}
-                disabled={isLoading}
-              >
-                {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
-              </button>
-
-              {/* Footer */}
-              <p className="text-center text-sm text-[#64748b] mt-4">
-                כבר יש לך חשבון?{" "}
-                <Link to="/login" className="font-semibold text-[#071325] hover:underline">
-                  התחבר עכשיו
-                </Link>
-              </p>
-            </div>
+      <div className="flex flex-col items-center gap-4 z-10 w-full max-w-[480px] mt-6 animate-[fadeUp_0.7s_ease_both]">
+        <div className="mb-1">
+          <div className="w-[68px] h-[68px] rounded-[18px] bg-[#0A192F] flex items-center justify-center shadow-[0_8px_32px_rgba(10,25,47,0.25)]">
+            {gradCap}
           </div>
         </div>
+
+        <div className="text-center">
+          <h1 className="text-[#0A192F] text-[26px] font-[800] tracking-[-0.3px]">מערכת מענקים לסטודנטים</h1>
+          <p className="text-[#5C6370] text-sm font-[300] mt-1">ניהול בקשות מענק אקדמי</p>
+        </div>
+
+        <div className="w-full flex flex-col bg-white/70 backdrop-blur-[18px] border border-[#0A192F]/10 rounded-[20px] p-7 gap-[18px] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
+          
+          <div className="flex rounded-xl bg-[#E5E0D5] p-1 gap-1">
+            <button type="button" style={{ flex: 1 }} className="py-2.5 rounded-[9px] text-[15px] font-[600] bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]">
+              הרשמה
+            </button>
+            <button type="button" onClick={() => navigate("/login")} className="flex-1 py-2.5 rounded-[9px] text-[15px] font-[600] transition-all duration-200 outline-none cursor-pointer bg-transparent text-[#5C6370] hover:opacity-80">
+              כניסה למערכת
+            </button>
+          </div>
+
+          {fields.map(({ key, label, placeholder, type }) => (
+            <div key={key} className="flex flex-col gap-1.5">
+              <label className="text-[#0A192F] text-sm font-[600] text-right">{label}</label>
+              <input
+                type={type}
+                value={form[key]}
+                onChange={handleChange(key)}
+                placeholder={placeholder}
+                dir="rtl"
+                className={`w-full bg-white border rounded-xl py-3 px-[18px] text-[#0A192F] text-[15px] text-right placeholder-[#A0AEC0] transition-all duration-200 outline-none focus:border-[#0A192F] focus:ring-[3px] focus:ring-[#0A192F]/15 ${
+                  errors[key] ? "border-[#E53E3E] focus:border-[#E53E3E] focus:ring-[#E53E3E]/15" : "border-[#D1D5DB]"
+                }`}
+              />
+              {errors[key] && <span className="text-[#E53E3E] text-xs text-right font-medium mt-0.5">{errors[key]}</span>}
+            </div>
+          ))}
+
+          <button onClick={handleSubmit} disabled={isLoading} className={`w-full py-3.5 rounded-xl text-base font-[700] tracking-[0.3px] shadow-[0_6px_24px_rgba(10,25,47,0.2)] mt-1 transition-all duration-200 outline-none active:scale-[0.98] ${isLoading ? "bg-[#0A192F]/70 text-[#F5F1E9]/80 cursor-not-allowed" : "bg-[#0A192F] text-[#F5F1E9] cursor-pointer hover:opacity-92"}`}>
+            {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
+          </button>
+
+          <p className="text-[#5C6370] text-[13px] text-center -mt-1">
+            כבר יש לך חשבון? <span onClick={() => navigate("/login")} className="text-[#0A192F] cursor-pointer font-[600] underline underline-offset-2 hover:opacity-80">כניסה למערכת</span>
+          </p>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 }
