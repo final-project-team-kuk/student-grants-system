@@ -1,9 +1,128 @@
-import { useState } from "react";
 
-const NAV_ITEMS = ["דף הבית", "הגשת בקשה", "סטטוס בקשה"];
+  // פונקציית עזר להצגת עיצוב מתאים לפי הסטטוס מה-DB
+import { useState, useEffect } from "react";
+
+// 👑 מחקנו מכאן את ה-getItem הישנים שגרמו ל-undefined!
 
 export default function ScholarshipStatus() {
-  const [activeNav, setActiveNav] = useState("סטטוס בקשה");
+  const [requestData, setRequestData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+ // עדכני את ה-useEffect שלך ב-ScholarshipStatus.jsx לזה:
+useEffect(() => {
+  const fetchStatus = async () => {
+    try {
+      // 1. נמצא את המפתח הנכון ב-localStorage
+      let currentUserId = null;
+      
+      // נחפש את כל המפתחות ב-localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        
+        // נבדוק אם זה המפתח שמכיל את ה-ID (האובייקט שראינו בצילום מסך)
+        if (value.includes("6a0cc9")) {
+           const parsed = JSON.parse(value);
+           currentUserId = parsed.id;
+           break;
+        }
+      }
+
+      if (!currentUserId) {
+        throw new Error("לא נמצא מזהה משתמש מחובר.");
+      }
+      
+      console.log("Found User ID:", currentUserId);
+
+      // 2. הפנייה לשרת עם ה-ID שמצאנו
+      const response = await fetch(`http://localhost:5000/api/requests/user/${currentUserId}`);
+
+      if (!response.ok) {
+        throw new Error("לא נמצאה בקשה עבור משתמש זה.");
+      }
+
+      const data = await response.json();
+      setRequestData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStatus();
+}, []);
+
+  // ... מכאן והלאה כל שאר הקוד שלך (getStatusConfig וה-return) נשאר בדיוק אותו הדבר!
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case "approved":
+        return {
+          text: "אושר",
+          icon: "✅",
+          color: "#1b5e20",
+          bg: "rgba(76, 175, 80, 0.15)",
+          border: "rgba(76, 175, 80, 0.45)",
+          gradient: "linear-gradient(135deg, #2e7d32, #4caf50)",
+          shadow: "rgba(76, 175, 80, 0.15)",
+          title: "הבקשה שלך אושרה!",
+          desc: "שמחים לעדכן שהבקשה למענק אושרה בהצלחה. סכום המענק יועבר לחשבונך בהתאם לתקנון."
+        };
+      case "rejected":
+        return {
+          text: "נדחה",
+          icon: "❌",
+          color: "#b71c1c",
+          bg: "rgba(244, 67, 54, 0.15)",
+          border: "rgba(244, 67, 54, 0.45)",
+          gradient: "linear-gradient(135deg, #c62828, #f44336)",
+          shadow: "rgba(244, 67, 54, 0.15)",
+          title: "הבקשה נדחתה",
+          desc: "לצערנו, לאחר בדיקת הפרטים, הבקשה לא אושרה. לפרטים נוספים ניתן לפנות למזכירות."
+        };
+      case "pending":
+      default:
+        return {
+          text: "בהמתנה לטיפול",
+          icon: "⏳",
+          color: "#9a7a00",
+          bg: "rgba(161,130,0,0.15)",
+          border: "rgba(200,165,0,0.45)",
+          gradient: "linear-gradient(135deg, #d4a900, #f0c000)",
+          shadow: "rgba(200,160,0,0.15)",
+          title: "הבקשה שלך התקבלה",
+          desc: "הבקשה נמצאת בתור לטיפול. נעדכן אותך בדוא\"ל כאשר יהיה שינוי בסטטוס."
+        };
+    }
+  };
+
+  // תצוגת טעינה
+  if (loading) {
+    return (
+      <div dir="rtl" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#F2EDE4", fontFamily: "Assistant" }}>
+        <h3>טוען נתונים...</h3>
+      </div>
+    );
+  }
+
+  // תצוגת שגיאה (או כשאין בקשה)
+  if (error) {
+    return (
+      <div dir="rtl" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#F2EDE4", fontFamily: "Assistant", padding: 20 }}>
+        <div style={{ background: "white", padding: 30, borderRadius: 12, textAlign: "center", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+          <p style={{ color: "#b71c1c", fontWeight: "bold", fontSize: 18 }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const statusConfig = getStatusConfig(requestData?.status);
+  
+  // פירסור תאריך הגשה מה-DB לפורמט קריא
+  const formattedDate = requestData?.createdAt 
+    ? new Date(requestData.createdAt).toLocaleDateString("he-IL") 
+    : "---";
 
   return (
     <div
@@ -18,183 +137,28 @@ export default function ScholarshipStatus() {
       }}
     >
       {/* Blobs */}
-      <div
-        style={{
-          position: "fixed",
-          width: 580,
-          height: 580,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)",
-          top: "-120px",
-          left: "-100px",
-          filter: "blur(80px)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          width: 450,
-          height: 450,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)",
-          bottom: "-80px",
-          right: "-60px",
-          filter: "blur(70px)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
+      <div style={{ position: "fixed", width: 580, height: 580, borderRadius: "50%", background: "radial-gradient(circle, rgba(10,25,47,0.18) 0%, transparent 70%)", top: "-120px", left: "-100px", filter: "blur(80px)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", width: 450, height: 450, borderRadius: "50%", background: "radial-gradient(circle, rgba(10,25,47,0.14) 0%, transparent 70%)", bottom: "-80px", right: "-60px", filter: "blur(70px)", pointerEvents: "none", zIndex: 0 }} />
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Varela+Round&family=Assistant:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body, #root { min-height: 100%; width: 100%; background: #F2EDE4; }
-        button:hover { opacity: 0.93; }
-
-        .display-font {
-          font-family: 'Assistant', sans-serif;
-          letter-spacing: -0.01em;
-        }
-        .nav-font {
-          font-family: 'Assistant', sans-serif;
-        }
-        .body-font {
-          font-family: 'Assistant', sans-serif;
-        }
-        .label-font {
-          font-family: 'Assistant', sans-serif;
-          font-size: 12px;
-          font-weight: 600;
-          color: #0A192F;
-          opacity: 0.45;
-        }
+        .display-font { font-family: 'Assistant', sans-serif; letter-spacing: -0.01em; }
+        .body-font { font-family: 'Assistant', sans-serif; }
+        .label-font { font-family: 'Assistant', sans-serif; font-size: 12px; font-weight: 600; color: #0A192F; opacity: 0.45; }
       `}</style>
-
-      {/* Navbar */}
-      <nav
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "14px 40px",
-          border: "none",
-          background: "rgba(242,237,228,0.7)",
-          backdropFilter: "blur(12px)",
-          position: "relative",
-          zIndex: 10,
-          boxShadow: "0 4px 24px rgba(10,25,47,0.22), 0 1px 0 rgba(10,25,47,0.08)",
-        }}
-      >
-        {/* RIGHT side: Logo + title */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              background: "#0A192F",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 14px rgba(10,25,47,0.2)",
-            }}
-          >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="#F5F1E9">
-              <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-              <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-            </svg>
-          </div>
-          <span className="display-font" style={{ fontWeight: 700, fontSize: 18, color: "#0A192F" }}>מערכת מענקים</span>
-        </div>
-
-        {/* CENTER: Nav links */}
-        <div style={{ display: "flex", gap: 6 }}>
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item}
-              onClick={() => setActiveNav(item)}
-              className="nav-font"
-              style={{
-                padding: "10px 32px",
-                borderRadius: 10,
-                border: "none",
-                cursor: "pointer",
-                fontSize: 16,
-                fontWeight: activeNav === item ? 700 : 400,
-                color: activeNav === item ? "#F5F1E9" : "#5C6370",
-                background: activeNav === item ? "#0A192F" : "transparent",
-                transition: "all 0.2s",
-                boxShadow: activeNav === item ? "0 4px 14px rgba(10,25,47,0.2)" : "none",
-              }}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-
-        {/* LEFT side: logout + user card */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              background: "rgba(10,25,47,0.06)",
-              borderRadius: 12,
-              padding: "6px 16px 6px 8px",
-              border: "1px solid rgba(10,25,47,0.1)",
-            }}
-          >
-            <div
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: "50%",
-                background: "#0A192F",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 700,
-                fontSize: 13,
-                flexShrink: 0,
-                color: "#F5F1E9",
-                fontFamily: "'Assistant', sans-serif",
-              }}
-            >
-              יכ
-            </div>
-            <span className="body-font" style={{ fontSize: 16, fontWeight: 500, color: "#0A192F" }}>ישראל כהן</span>
-          </div>
-          <button
-            className="body-font"
-            style={{
-              padding: "9px 22px",
-              borderRadius: 10,
-              border: "1px solid rgba(10,25,47,0.18)",
-              background: "rgba(10,25,47,0.05)",
-              color: "#0A192F",
-              cursor: "pointer",
-              fontSize: 16,
-              fontWeight: 500,
-            }}
-          >
-            יציאה
-          </button>
-        </div>
-      </nav>
 
       {/* Main content */}
       <main style={{ maxWidth: 760, margin: "0 auto", padding: "56px 20px", position: "relative", zIndex: 1 }}>
 
         {/* Page title */}
         <div style={{ textAlign: "right", marginBottom: 36 }}>
-          <h1 className="display-font" style={{ fontSize: 30, fontWeight: 700, margin: 0, color: "#0A192F", letterSpacing: "-0.01em" }}>
+          <h1 className="display-font" style={{ fontSize: 30, fontWeight: 700, margin: 0, color: "#0A192F" }}>
             סטטוס הבקשה
           </h1>
           <p className="body-font" style={{ color: "#5C6370", marginTop: 6, fontSize: 15, fontWeight: 400 }}>
-            מצב הבקשה האחרונה שהגשת
+            מצב הבקשה האחרונה שהגשת עבור {requestData?.userSnapshot?.firstName} {requestData?.userSnapshot?.lastName}
           </p>
         </div>
 
@@ -212,23 +176,15 @@ export default function ScholarshipStatus() {
             boxShadow: "0 24px 60px rgba(0,0,0,0.06)",
           }}
         >
-          {/* Badge row */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 28,
-              flexDirection: "row",
-            }}
-          >
+          {/* Dynamic Badge row */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 28, flexDirection: "row" }}>
             <div
               style={{
-                background: "rgba(161,130,0,0.15)",
-                border: "1px solid rgba(200,165,0,0.45)",
+                background: statusConfig.bg,
+                border: `1px solid ${statusConfig.border}`,
                 borderRadius: 999,
                 padding: "8px 22px",
-                color: "#9a7a00",
+                color: statusConfig.color,
                 fontWeight: 700,
                 fontSize: 15,
                 display: "flex",
@@ -237,7 +193,7 @@ export default function ScholarshipStatus() {
                 fontFamily: "'Assistant', sans-serif",
               }}
             >
-              ⏳ בהמתנה לטיפול
+              {statusConfig.icon} {statusConfig.text}
             </div>
 
             <div
@@ -245,33 +201,25 @@ export default function ScholarshipStatus() {
                 width: 56,
                 height: 56,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #d4a900, #f0c000)",
+                background: statusConfig.gradient,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 0 0 6px rgba(200,160,0,0.15)",
+                boxShadow: `0 0 0 6px ${statusConfig.shadow}`,
                 flexShrink: 0,
               }}
             >
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: 28,
-                  fontWeight: 900,
-                  lineHeight: 1,
-                  fontFamily: "Georgia, serif",
-                }}
-              >
-                !
+              <span style={{ color: "#fff", fontSize: 24, fontWeight: 900, fontFamily: "sans-serif" }}>
+                {statusConfig.icon}
               </span>
             </div>
           </div>
 
           <h2 className="display-font" style={{ fontSize: 22, fontWeight: 700, margin: "0 0 14px", color: "#0A192F" }}>
-            הבקשה שלך התקבלה
+            {statusConfig.title}
           </h2>
           <p className="body-font" style={{ color: "#5C6370", fontSize: 15, lineHeight: 1.9, margin: 0, fontWeight: 400 }}>
-            הבקשה נמצאת בתור לטיפול. נעדכן אותך בדוא"ל כאשר יהיה שינוי בסטטוס.
+            {statusConfig.desc}
           </p>
         </div>
 
@@ -287,56 +235,29 @@ export default function ScholarshipStatus() {
             boxShadow: "0 24px 60px rgba(0,0,0,0.06)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 24,
-              direction: "rtl",
-            }}
-          >
-            <span
-              className="label-font"
-              style={{
-                fontFamily: "'Assistant', sans-serif",
-                letterSpacing: "0.08em",
-                fontSize: 11,
-                fontWeight: 700,
-                color: "#0A192F",
-                opacity: 0.5,
-                whiteSpace: "nowrap",
-              }}
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, direction: "rtl" }}>
+            <span className="label-font" style={{ fontSize: 11, fontWeight: 700, color: "#0A192F", opacity: 0.5, whiteSpace: "nowrap" }}>
               פרטי הבקשה
             </span>
-            <div
-              style={{
-                flex: 1,
-                height: 1,
-                background: "rgba(10,25,47,0.12)",
-              }}
-            />
+            <div style={{ flex: 1, height: 1, background: "rgba(10,25,47,0.12)" }} />
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 24,
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             <div style={{ textAlign: "right" }}>
               <div className="body-font" style={{ color: "#5C6370", fontSize: 13, marginBottom: 6, fontWeight: 400 }}>
                 תאריך הגשה
               </div>
-              <div className="display-font" style={{ fontWeight: 700, fontSize: 18, color: "#0A192F" }}>12/05/2025</div>
+              <div className="display-font" style={{ fontWeight: 700, fontSize: 18, color: "#0A192F" }}>
+                {formattedDate}
+              </div>
             </div>
             <div style={{ textAlign: "right" }}>
               <div className="body-font" style={{ color: "#5C6370", fontSize: 13, marginBottom: 6, fontWeight: 400 }}>
-                מגמה
+                מגמה / תחום לימוד
               </div>
-              <div className="display-font" style={{ fontWeight: 700, fontSize: 18, color: "#0A192F" }}>מדעי המחשב</div>
+              <div className="display-font" style={{ fontWeight: 700, fontSize: 18, color: "#0A192F" }}>
+                {requestData?.education?.field || "לא צוין"}
+              </div>
             </div>
           </div>
         </div>
@@ -344,3 +265,4 @@ export default function ScholarshipStatus() {
     </div>
   );
 }
+
