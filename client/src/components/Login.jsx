@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // ייבוא הספרייה
+import Swal from 'sweetalert2';
 
 const gradCap = (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
@@ -8,13 +8,11 @@ const gradCap = (
   </svg>
 );
 
-export default function Login() {
+// ─── FIX: accept auth as a prop ───────────────────────────────────────────────
+export default function Login({ auth }) {
   const [idNumber, setIdNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -44,6 +42,9 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // ─── FIX: store user + token in auth state & localStorage ────────────
+        auth.login(data.user, data.token);
+
         Swal.fire({
           icon: 'success',
           title: `ברוך הבא, ${data.user.firstName}!`,
@@ -89,7 +90,7 @@ export default function Login() {
           <p style={{ color: "#5C6370", fontSize: "14px", marginBottom: "24px" }}>ניהול בקשות מענק אקדמי</p>
 
           <form onSubmit={handleLogin} className="w-full flex flex-col" style={{ background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(12px)", borderRadius: "24px", padding: "28px", gap: "20px", boxShadow: "0 20px 40px rgba(0,0,0,0.05)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>
-            
+
             <div className="flex bg-[#E5E0D5] p-1 rounded-xl mb-2">
               <button type="button" style={{ flex: 1, padding: "10px", borderRadius: "9px", border: "none", fontWeight: 800, background: "#0A192F", color: "#F5F1E9" }}>כניסה למערכת</button>
               <button type="button" onClick={() => navigate("/register")} style={{ flex: 1, padding: "10px", borderRadius: "9px", border: "none", cursor: "pointer", fontWeight: 800, background: "transparent", color: "#5C6370" }}>הרשמה</button>
@@ -97,20 +98,39 @@ export default function Login() {
 
             <div className="flex flex-col" style={{ gap: "6px" }}>
               <label style={{ color: "#0A192F", fontSize: "13px", fontWeight: 700 }}>מספר זהות</label>
-              <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="הכנס מספר זהות" style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }} />
+              <input
+                type="text"
+                value={idNumber}
+                onChange={(e) => setIdNumber(e.target.value)}
+                placeholder="הכנס מספר זהות"
+                style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }}
+              />
             </div>
 
             <div className="flex flex-col" style={{ gap: "6px" }}>
               <label style={{ color: "#0A192F", fontSize: "13px", fontWeight: 700 }}>סיסמה</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="הכנס סיסמה" style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }} />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="הכנס סיסמה"
+                style={{ background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: "12px", padding: "12px 14px" }}
+              />
             </div>
 
-            <button type="submit" disabled={isLoading} style={{ width: "100%", padding: "14px", borderRadius: "12px", border: "none", background: "#0A192F", color: "#F5F1E9", fontSize: "16px", fontWeight: 800, marginTop: "4px", cursor: isLoading ? "not-allowed" : "pointer" }}>
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{ width: "100%", padding: "14px", borderRadius: "12px", border: "none", background: "#0A192F", color: "#F5F1E9", fontSize: "16px", fontWeight: 800, marginTop: "4px", cursor: isLoading ? "not-allowed" : "pointer" }}
+            >
               {isLoading ? "מתחבר..." : "כניסה למערכת"}
             </button>
-            
+
             <p style={{ color: "#5C6370", fontSize: "13px", textAlign: "center", marginTop: "4px" }}>
-              אין לך חשבון? <span onClick={() => navigate("/register")} style={{ color: "#0A192F", cursor: "pointer", fontWeight: 700, textDecoration: "underline" }}>צור אותו עכשיו...</span>
+              אין לך חשבון?{" "}
+              <span onClick={() => navigate("/register")} style={{ color: "#0A192F", cursor: "pointer", fontWeight: 700, textDecoration: "underline" }}>
+                צור אותו עכשיו...
+              </span>
             </p>
           </form>
         </div>

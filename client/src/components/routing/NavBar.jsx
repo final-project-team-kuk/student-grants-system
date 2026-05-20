@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Navbar({ auth }) {
@@ -11,6 +10,16 @@ export default function Navbar({ auth }) {
     auth?.logout?.();
     navigate('/');
   };
+
+  // ─── FIX: backend returns { firstName, lastName } — build display name ──────
+  const displayName = auth?.user
+    ? `${auth.user.firstName ?? ''} ${auth.user.lastName ?? ''}`.trim()
+    : '';
+
+  // Initials for the avatar bubble
+  const initials = auth?.user
+    ? `${auth.user.firstName?.[0] ?? ''}${auth.user.lastName?.[0] ?? ''}`.toUpperCase() || 'סט'
+    : 'סט';
 
   return (
     <nav className="flex flex-wrap items-center justify-between gap-4 px-8 py-5 border-b border-[#122843]/50 bg-[#071325]">
@@ -29,9 +38,7 @@ export default function Navbar({ auth }) {
             to="/dashboard"
             className={({ isActive }) =>
               `transition px-5 py-2 rounded-full font-medium ${
-                isActive
-                  ? 'bg-[#1f4ea8]/20 text-[#E5DED0]'
-                  : 'text-[#cbd5ea] hover:text-white'
+                isActive ? 'bg-[#1f4ea8]/20 text-[#E5DED0]' : 'text-[#cbd5ea] hover:text-white'
               }`
             }
           >
@@ -41,9 +48,7 @@ export default function Navbar({ auth }) {
             to="/register"
             className={({ isActive }) =>
               `transition px-5 py-2 rounded-full font-medium ${
-                isActive
-                  ? 'bg-[#1f4ea8]/20 text-[#E5DED0]'
-                  : 'text-[#cbd5ea] hover:text-white'
+                isActive ? 'bg-[#1f4ea8]/20 text-[#E5DED0]' : 'text-[#cbd5ea] hover:text-white'
               }`
             }
           >
@@ -62,16 +67,19 @@ export default function Navbar({ auth }) {
           </button>
         ) : (
           <>
+            {/* ─── FIX: logout button calls handleLogout which calls auth.logout() ── */}
             <button
               onClick={handleLogout}
               className="text-base bg-[#0d2544] hover:bg-[#163a71] text-white px-5 py-2 rounded-lg border border-[#1f4ea8] transition"
             >
               יציאה
             </button>
+
+            {/* ─── FIX: display firstName + lastName instead of auth.user.name ──── */}
             <div className="flex items-center gap-3 rounded-full bg-[#0d2544]/70 px-4 py-2 border border-[#1f4ea8]">
-              <span className="text-base font-medium text-white">{auth.user.name}</span>
+              <span className="text-base font-medium text-white">{displayName}</span>
               <div className="bg-[#1f4ea8] text-white text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full">
-                {auth.user.name ? auth.user.name.slice(0, 2).toUpperCase() : 'סט'}
+                {initials}
               </div>
             </div>
           </>

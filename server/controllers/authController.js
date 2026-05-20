@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// לוגיקת הרשמה
+// ── הרשמה ──────────────────────────────────────────────────────────────────────
 const register = async (req, res) => {
   try {
     const { firstName, lastName, idNumber, email, password } = req.body;
@@ -13,17 +13,17 @@ const register = async (req, res) => {
       return res.status(400).json({ error: "משתמש עם פרטים אלו כבר קיים במערכת" });
     }
 
-    // 2. הצפנת הסיסמה לקולקשיין
+    // 2. הצפנת הסיסמה
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 3. יצירת המשתמש החדש
+    // 3. יצירת המשתמש
     const newUser = new User({
       firstName,
       lastName,
       idNumber,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     await newUser.save();
@@ -34,35 +34,41 @@ const register = async (req, res) => {
   }
 };
 
-// לוגיקת התחברות
+// ── התחברות ────────────────────────────────────────────────────────────────────
 const login = async (req, res) => {
   try {
     const { idNumber, password } = req.body;
 
-    // 1. חיפוש המשתמש לפי תעודת זהות
+    // 1. חיפוש לפי מספר זהות
+    // ─── FIX: field name is 'idNumber' — matches the User schema ─────────────
     const user = await User.findOne({ idNumber });
     if (!user) {
       return res.status(400).json({ error: "תעודת זהות או סיסמה שגויים" });
     }
 
-    // 2. בדיקת התאמת סיסמה
+    // 2. בדיקת סיסמה
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "תעודת זהות או סיסמה שגויים" });
     }
 
-    // 3. יצירת טוקן אבטחה JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secretkey", { expiresIn: "1h" });
+    // 3. יצירת JWT
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || "secretkey",
+      { expiresIn: "1h" }
+    );
 
+    // ─── FIX: return firstName + lastName so Navbar and Login can display them ─
     res.status(200).json({
       message: "התחברת בהצלחה",
       token,
       user: {
-        id: user._id,
+        id:        user._id,
         firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
-      }
+        lastName:  user.lastName,
+        email:     user.email,
+      },
     });
   } catch (error) {
     console.error(error);
