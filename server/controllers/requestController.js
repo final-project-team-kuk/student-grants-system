@@ -1,13 +1,16 @@
 const requestModel = require('../models/requestModel');
-const Request = require('../db/Request');
 const mongoose = require('mongoose');
 
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 const create = (req, res) => {
+  console.log("השרת קיבל את הנתונים האלו:", req.body); // הדפסת ה-body
   const new_request = new requestModel(req.body);
   new_request.save()
     .then(request => res.status(201).send(request))
-    .catch(error => res.status(500).send({ error: error.message }));
+    .catch(error => {
+      console.error("!!! שגיאת מונגוס מפורטת:", error); 
+    res.status(500).send({ error: error.message, details: error.errors });
+    });
 };
 
 // ─── READ ALL ─────────────────────────────────────────────────────────────────
@@ -19,7 +22,7 @@ const read = (req, res) => {
 
 // ─── READ ONE ─────────────────────────────────────────────────────────────────
 const readOne = (req, res) => {
-  requestModel.findOne({ 'userSnapshot.nationalId': String(req.params.id).trim() })
+  requestModel.findById(req.params.id)
     .then(request => {
       if (!request) return res.status(404).send({ error: 'Request not found' });
       return res.status(200).send(request);
@@ -47,8 +50,8 @@ const updateStatus = (req, res) => {
   if (!['pending', 'approved', 'rejected'].includes(status)) {
     return res.status(400).send({ error: 'Invalid status value' });
   }
-  requestModel.findOneAndUpdate(
-    { 'userSnapshot.nationalId': String(req.params.id).trim() },
+  requestModel.findByIdAndUpdate(
+    req.params.id,
     { $set: { status } },
     { new: true }
   )
@@ -63,7 +66,7 @@ const updateStatus = (req, res) => {
 const updateEducation = async (req, res) => {
   try {
     const { education } = req.body;
-    const request = await Request.findByIdAndUpdate(
+    const request = await requestModel.findByIdAndUpdate(
       req.params.id,
       { education },
       { new: true }
@@ -89,7 +92,7 @@ const remove = (req, res) => {
 const getRequestStatus = async (req, res) => {
   try {
     const objectId = new mongoose.Types.ObjectId(req.params.userId);
-    const request = await Request.findOne({ userId: objectId }).sort({ createdAt: -1 });
+    const request = await requestModel.findOne({ userId: objectId }).sort({ createdAt: -1 });
     if (!request) return res.status(404).json({ message: 'No request found for this user' });
     res.json({ status: request.status, createdAt: request.createdAt, education: request.education, userSnapshot: request.userSnapshot });
   } catch (error) {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 export default function ({ formData, prevStep, onFinalSubmit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agreed, setAgreed] = useState(true);
-
+console.log("הנתונים שהגיעו לשלב 6 מכל הטופס:", formData);
   // שליפת שמות ופרטים אמיתיים מה-localStorage או מה-formData
   const studentFirstName = localStorage.getItem("firstName") || "";
   const studentLastName = localStorage.getItem("lastName") || "";
