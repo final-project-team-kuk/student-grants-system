@@ -6,6 +6,7 @@ import FromStepTwo from './FromStepTwo';
 import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
 import Step3Studies from './Step3Studies';
 import { FormStep5 } from './FormStep5';
+import SubmitRequestStep from './step6-confirm';
 
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,34 +91,24 @@ export default function HeaderSteps() {
 
       case 5:
         return (
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 5: העלאת קבצים</h2>
-            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={goToNextStep} className="px-6 py-2 bg-[#071325] text-white rounded-lg font-bold">דילוג לשלב הבא</button>
-              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
-            </div>
-          </div>
+          <FormStep5
+            nextStep={goToNextStep}
+            prevStep={goToPrevStep}
+            currentStep={currentStep}
+            formData={formData}
+            setFormData={setFormData}
+            saveDraft={handleSaveDraft}
+          />
         );
 
       case 6:
         return (
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 6: אישור ושליחה</h2>
-            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
-              <button 
-                onClick={() => {
-                  alert('הטופס נשלח בהצלחה! (בכאילו)');
-                  localStorage.removeItem('globalFormDraft'); // מוחק את הטיוטה בסיום התהליך
-                }} 
-                className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold"
-              >
-                שלח בקשה סופית
-              </button>
-            </div>
-          </div>
+      <SubmitRequestStep
+      prevStep={goToPrevStep}
+      currentStep={currentStep}
+      saveDraft={handleSaveDraft}
+      //  onSubmit={handleFinalSubmit}
+       />
         );
 
       default:

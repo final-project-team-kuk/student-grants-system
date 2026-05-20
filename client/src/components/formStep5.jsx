@@ -3,6 +3,9 @@ import { useRef, useState } from "react";
 export const FormStep5 = ({
   nextStep,
   prevStep,
+  formData,
+  setFormData,
+  saveDraft,
 }) => {
   const [files, setFiles] = useState({
     studentId: null,

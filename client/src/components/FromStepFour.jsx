@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form'; // 1. מייבאים את הספרייה החדשה
+import { useForm } from'react-hook-form'; // 1. מייבאים את הספרייה החדשה
 
 export default function BankDetailsStep({ nextStep, prevStep }) {
   

@@ -38,8 +38,7 @@ export default function Register() {
     if (!form.lastName.trim()) tempErrors.lastName = "שם משפחה הוא שדה חובה";
     else if (!nameRegex.test(form.lastName.trim())) tempErrors.lastName = "שם משפחה חייב להכיל אותיות בלבד";
     else if (form.lastName.trim().length < 2) tempErrors.lastName = "שם משפחה חייב להכיל לפחות 2 אותיות";
-    
-    // כאן השינוי היחיד שביקשת - בדיקה של בדיוק 9 ספרות
+
     if (!form.idNumber.trim()) tempErrors.idNumber = "מספר זהות הוא שדה חובה";
     else if (!/^\d{9}$/.test(form.idNumber.trim())) tempErrors.idNumber = "מספר זהות חייב להכיל בדיוק 9 ספרות";
 
@@ -145,7 +144,7 @@ export default function Register() {
         </div>
 
         <div className="w-full flex flex-col bg-white/70 backdrop-blur-[18px] border border-[#0A192F]/10 rounded-[20px] p-7 gap-[18px] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
-          
+
           <div className="flex rounded-xl bg-[#E5E0D5] p-1 gap-1">
             <button type="button" style={{ flex: 1 }} className="py-2.5 rounded-[9px] text-[15px] font-[600] bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]">
               הרשמה
@@ -172,12 +171,21 @@ export default function Register() {
             </div>
           ))}
 
-          <button onClick={handleSubmit} disabled={isLoading} className={`w-full py-3.5 rounded-xl text-base font-[700] tracking-[0.3px] shadow-[0_6px_24px_rgba(10,25,47,0.2)] mt-1 transition-all duration-200 outline-none active:scale-[0.98] ${isLoading ? "bg-[#0A192F]/70 text-[#F5F1E9]/80 cursor-not-allowed" : "bg-[#0A192F] text-[#F5F1E9] cursor-pointer hover:opacity-92"}`}>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className={`w-full py-3.5 rounded-xl text-base font-[700] tracking-[0.3px] shadow-[0_6px_24px_rgba(10,25,47,0.2)] mt-1 transition-all duration-200 outline-none active:scale-[0.98] ${
+              isLoading ? "bg-[#0A192F]/70 text-[#F5F1E9]/80 cursor-not-allowed" : "bg-[#0A192F] text-[#F5F1E9] cursor-pointer hover:opacity-92"
+            }`}
+          >
             {isLoading ? "יוצר חשבון..." : "יצירת חשבון"}
           </button>
 
           <p className="text-[#5C6370] text-[13px] text-center -mt-1">
-            כבר יש לך חשבון? <span onClick={() => navigate("/login")} className="text-[#0A192F] cursor-pointer font-[600] underline underline-offset-2 hover:opacity-80">כניסה למערכת</span>
+            כבר יש לך חשבון?{" "}
+            <span onClick={() => navigate("/login")} className="text-[#0A192F] cursor-pointer font-[600] underline underline-offset-2 hover:opacity-80">
+              כניסה למערכת
+            </span>
           </p>
         </div>
       </div>
