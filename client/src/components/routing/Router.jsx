@@ -21,7 +21,9 @@ export const Router = ({ auth }) => {
         <Route path="/" element={<MainComponent />} />
 
         {/* Protected routes */}
-        <Route path="/dashboard" element={<RequireAuth auth={auth}><Dashboard /></RequireAuth>} />
+        <Route path="/dashboard" element={
+  <RequireAuth auth={auth}><Dashboard auth={auth} /></RequireAuth>
+} />
         <Route path="/request-status" element={<RequireAuth auth={auth}><ScholarshipStatus /></RequireAuth>} />
         <Route path="/from-step-two" element={<RequireAuth auth={auth}><FromStepTwo /></RequireAuth>} />
         <Route path="/HeadSteps" element={<RequireAuth auth={auth}><HeaderSteps /></RequireAuth>} />

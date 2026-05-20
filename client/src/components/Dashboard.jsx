@@ -1,15 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. מייבאים את הכלי החדש של ריאקט
-import HeadSteps from './HeadSteps'; // 2. מייבאים את המעטפת של הטופס שלנו
-import ScholarshipStatus from './statusRequest (2)'; // 3. מייבאים את עמוד הסטטוס שלנו  
-export default function Dashboard() {
-  const navigate = useNavigate(); // 2. יוצרים את ה"מנווט" שלנו
+import { useNavigate } from 'react-router-dom';
+
+export default function Dashboard({ auth }) {
+  const navigate = useNavigate();
+
+  // ─── read the logged-in user's first name from auth ──────────────────────────
+  const firstName = auth?.user?.firstName || 'סטודנט';
 
   return (
-    <div className="min-h-screen   background-color: #f4f2ec; pt-24 px-4">
+    <div className="min-h-screen background-color: #f4f2ec; pt-24 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, ישראל 👋</h1>
+          {/* ─── FIX: use real first name instead of hardcoded ישראל ─────────── */}
+          <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, {firstName} 👋</h1>
           <p className="text-[#071325]">ברוך הבא למערכת ניהול בקשות המענקים האקדמיים</p>
         </div>
 
@@ -17,11 +20,10 @@ export default function Dashboard() {
           {/* כפתור הגשת בקשה */}
           <button
             type="button"
-            onClick={() => navigate('/HeadSteps')} // 3. בלחיצה על הכפתור -> נווט לטופס!
+            onClick={() => navigate('/HeadSteps')}
             className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full"
           >
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
-
             <div className="flex flex-col items-center text-center relative z-10">
               <div className="bg-[#071325] p-4 rounded-2xl mb-6 shadow-lg shadow-[#071325]/20 group-hover:scale-105 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,11 +40,12 @@ export default function Dashboard() {
           </button>
 
           {/* כפתור סטטוס */}
-          <button type="button"
-          onClick={() => navigate('/request-status')} // 3. בלחיצה על הכפתור -> נווט לעמוד סטטוס!
-          className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full">
+          <button
+            type="button"
+            onClick={() => navigate('/request-status')}
+            className="bg-white border border-[#e2dfd8] rounded-2xl p-8 hover:border-[#071325]/30 transition cursor-pointer relative overflow-hidden group text-right w-full"
+          >
             <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-[#071325]/5 blur-3xl rounded-full"></div>
-
             <div className="flex flex-col items-center text-center relative z-10">
               <div className="bg-[#071325] p-4 rounded-2xl mb-6 shadow-lg shadow-[#071325]/20 group-hover:scale-105 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
