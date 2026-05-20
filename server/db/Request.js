@@ -1,15 +1,7 @@
 const mongoose = require("mongoose");
 
 const requestSchema = new mongoose.Schema({
-
-  // קשר למשתמש
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-
-  // סטטוס ותאריך
+  // 👑 השארנו רק מופע אחד של userId כולל האינדקס לחיפוש מהיר
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -94,7 +86,7 @@ const requestSchema = new mongoose.Schema({
     studyApproval: { type: String, required: true },
     bankApproval: { type: String, required: true }
   }
- 
 });
+
+// 👑 פתרון הקונפליקט: שימוש ב-requestSchema (עם r קטנה) למניעת קריסה
 module.exports = mongoose.models.Request || mongoose.model('Request', requestSchema);
-//module.exports = mongoose.model("Request", requestSchema);

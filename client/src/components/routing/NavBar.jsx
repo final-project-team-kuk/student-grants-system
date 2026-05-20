@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'; // 1. 🌟 מייבאים את useLocation
 export default function Navbar() {
+
   const navigate = useNavigate();
+  const location = useLocation(); // 2. 🌟 משתמשים ב- useLocation
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const [fullName, setFullName] = useState("אורח");
+  const [initials, setInitials] = useState("");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -11,14 +15,29 @@ export default function Navbar() {
         setShowLoginDropdown(false);
       }
     };
+    const fName = localStorage.getItem("firstName") || "";
+    const lName = localStorage.getItem("lastName") || "";
+    
+    if (fName || lName) {
+      setFullName(`${fName} ${lName}`.trim());
+      
+      // לוקחים את האות הראשונה של השם הפרטי והאות הראשונה של שם המשפחה
+      const firstLetter = fName ? fName.charAt(0) : "";
+      const lastLetter = lName ? lName.charAt(0) : "";
+      setInitials(firstLetter + lastLetter);
+    }else {
+      // 💡 בונוס: אם אין נתונים (למשל אחרי התנתקות), נחזיר את המצב ל"אורח"
+      setFullName("אורח");
+      setInitials("");
+    }
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleLogout = () => {
-    // Add logout logic here if needed
-    navigate('/');
+      localStorage.clear(); 
+      navigate('/'); 
   };
   return (
     <nav className="flex items-center justify-between p-4 border-b border-[#122843]/50 bg-[#071325]">
@@ -96,9 +115,9 @@ export default function Navbar() {
           יציאה
         </button>
         <div className="flex items-center gap-3 bg-[#0d2544]/70 px-3 py-1.5 rounded-full border border-[#1f4ea8]">
-          <span className="text-sm font-medium text-white">ישראל כהן</span>
+          <span className="text-sm font-medium text-white">{fullName}</span>
           <div className="bg-[#1f4ea8] text-white text-xs font-bold w-7 h-7 flex items-center justify-center rounded-full">
-            יכ
+            {initials}
           </div>
         </div>
       </div>

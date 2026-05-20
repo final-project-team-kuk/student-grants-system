@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form'; // 1. מייבאים את הספרייה החדשה
 
-export default function BankDetailsStep({ nextStep, prevStep,defaultValues, onStepSubmit }) {
+export default function BankDetailsStep({nextStep, prevStep, formData, setFormData, saveDraft  }) {
   
   // פונקציית בדיקת תקינות תעודת זהות ישראלית
   const isValidTZ = (id) => {
@@ -17,13 +17,18 @@ export default function BankDetailsStep({ nextStep, prevStep,defaultValues, onSt
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm({ defaultValues:defaultValues });
+  } = useForm({defaultValues: {
+    accountHolderId: formData.accountHolderId || "",
+    bankName: formData.bankName || "",
+    branchNumber: formData.branchNumber || "",
+    accountNumber: formData.accountNumber || ""
+  }});
 
-  // הפונקציה שתרוץ רק אם כל השדות בפרטי הבנק תקינים לחלוטין
+  // כשהמשתמש לוחץ 'הבא' ועובר את כל הבדיקות
   const onValidSubmit = (data) => {
-    console.log("נתוני בנק תקינים ומאושרים:", data);
-    onStepSubmit(data); // שומר את הנתונים באב
-    nextStep(); // עוברים בהצלחה לשלב 5!
+    // קודם כל מעדכנים את המחברת של האבא
+    setFormData(prev => ({ ...prev, ...data }));
+    nextStep(); // ואז עוברים שלב
   };
 
   return (
@@ -65,7 +70,7 @@ export default function BankDetailsStep({ nextStep, prevStep,defaultValues, onSt
                     required: "שדה חובה",
                     validate: (value) => isValidTZ(value) || "מספר תעודת הזהות אינו תקין לחלוטין"
                   })}
-                />
+                />שמונה
                 {errors.accountHolderId && <p className="text-red-500 text-xs mt-1 mr-1">{errors.accountHolderId.message}</p>}
               </div>
 

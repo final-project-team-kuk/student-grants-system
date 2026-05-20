@@ -60,11 +60,9 @@ export default function ScholarshipStatus() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        // 1. שומרים זמנית את המשתמש המדומה (נועה לוי) בתוך ה-localStorage
-        localStorage.setItem("nationalId", "987654321"); 
-        
+       
         // 2. שולפים את ה-ID *בתוך* הפונקציה כדי שיהיה מעודכן ב-100%
-        const currentUserId = localStorage.getItem("nationalId"); 
+        const currentUserId = localStorage.getItem("userId"); 
 
         if (!currentUserId) {
           throw new Error("לא נמצא מזהה משתמש מחובר.");
@@ -73,7 +71,7 @@ export default function ScholarshipStatus() {
         // 3. מבצעים את הפנייה לשרת
         console.log("Fetching status for ID:", currentUserId); // הדפסה לביקורת ב-Console
         
-        const response = await fetch(`http://localhost:5000/api/requests/status/${currentUserId}`, {
+        const response = await fetch(`http://localhost:5000/api/requests/user/${currentUserId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

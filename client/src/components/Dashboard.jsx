@@ -1,15 +1,25 @@
 import React from 'react';
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'; // 1. מייבאים את הכלי החדש של ריאקט
 import HeadSteps from './HeadSteps'; // 2. מייבאים את המעטפת של הטופס שלנו
 import ScholarshipStatus from './statusRequest (2)'; // 3. מייבאים את עמוד הסטטוס שלנו  
+
 export default function Dashboard() {
   const navigate = useNavigate(); // 2. יוצרים את ה"מנווט" שלנו
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    const savedFirstName = localStorage.getItem("firstName");
+    if (savedFirstName) {
+      setFirstName(savedFirstName);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen   background-color: #f4f2ec; pt-24 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, ישראל 👋</h1>
+          <h1 className="text-3xl font-bold text-[#071325] mb-2">שלום, {firstName || "סטודנט"} 👋</h1>
           <p className="text-[#071325]">ברוך הבא למערכת ניהול בקשות המענקים האקדמיים</p>
         </div>
 

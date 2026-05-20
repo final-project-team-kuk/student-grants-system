@@ -1,51 +1,100 @@
+const requestModel = require('../models/requestModel');
 const Request = require('../db/Request');
 const mongoose = require('mongoose');
 
-const formatRequestResponse = (request) => ({
-  status: request.status,
-  createdAt: request.createdAt,
-  education: request.education,
-  userSnapshot: request.userSnapshot,
-});
+// ─── CREATE ───────────────────────────────────────────────────────────────────
+const create = (req, res) => {
+  const new_request = new requestModel(req.body);
+  new_request.save()
+    .then(request => res.status(201).send(request))
+    .catch(error => res.status(500).send({ error: error.message }));
+};
 
+// ─── READ ALL ─────────────────────────────────────────────────────────────────
+const read = (req, res) => {
+  requestModel.find()
+    .then(requests => res.status(200).send(requests))
+    .catch(error => res.status(500).send({ error: error.message }));
+};
+
+// ─── READ ONE ─────────────────────────────────────────────────────────────────
+const readOne = (req, res) => {
+  requestModel.findOne({ 'userSnapshot.nationalId': String(req.params.id).trim() })
+    .then(request => {
+      if (!request) return res.status(404).send({ error: 'Request not found' });
+      return res.status(200).send(request);
+    })
+    .catch(error => res.status(500).send({ error: error.message }));
+};
+
+// ─── UPDATE ───────────────────────────────────────────────────────────────────
+const update = (req, res) => {
+  requestModel.findOneAndUpdate(
+    { 'userSnapshot.nationalId': String(req.params.id).trim() },
+    { $set: req.body },
+    { new: true, runValidators: true }
+  )
+    .then(request => {
+      if (!request) return res.status(404).send({ error: 'Request not found' });
+      return res.status(200).send(request);
+    })
+    .catch(error => res.status(500).send({ error: error.message }));
+};
+
+// ─── UPDATE STATUS ────────────────────────────────────────────────────────────
+const updateStatus = (req, res) => {
+  const { status } = req.body;
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    return res.status(400).send({ error: 'Invalid status value' });
+  }
+  requestModel.findOneAndUpdate(
+    { 'userSnapshot.nationalId': String(req.params.id).trim() },
+    { $set: { status } },
+    { new: true }
+  )
+    .then(request => {
+      if (!request) return res.status(404).send({ error: 'Request not found' });
+      return res.status(200).send(request);
+    })
+    .catch(error => res.status(500).send({ error: error.message }));
+};
+
+// ─── UPDATE EDUCATION ─────────────────────────────────────────────────────────
+const updateEducation = async (req, res) => {
+  try {
+    const { education } = req.body;
+    const request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { education },
+      { new: true }
+    );
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    res.json(request);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// ─── DELETE ───────────────────────────────────────────────────────────────────
+const remove = (req, res) => {
+  requestModel.findOneAndDelete({ 'userSnapshot.nationalId': String(req.params.id).trim() })
+    .then(request => {
+      if (!request) return res.status(404).send({ error: 'Request not found' });
+      return res.status(200).send({ message: 'Request deleted successfully' });
+    })
+    .catch(error => res.status(500).send({ error: error.message }));
+};
+
+// ─── GET BY USER ID (for status page) ────────────────────────────────────────
 const getRequestStatus = async (req, res) => {
   try {
-    const { userId } = req.params;
-   // const objectId = new mongoose.Types.ObjectId(userId);
-const request = await Request.findOne({ "userSnapshot.nationalId": userId }).sort({ createdAt: -1 });
-    if (!request) {
-      return res.status(404).json({ message: 'No request found for this user' });
-    }
-
-    res.json(formatRequestResponse(request));
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getCurrentRequestStatus = async (req, res) => {
-  try {
-    const userId = req.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
-    const objectId = new mongoose.Types.ObjectId(userId);
+    const objectId = new mongoose.Types.ObjectId(req.params.userId);
     const request = await Request.findOne({ userId: objectId }).sort({ createdAt: -1 });
-
-    if (!request) {
-      return res.status(404).json({ message: 'No request found for this user' });
-    }
-
-    res.json(formatRequestResponse(request));
+    if (!request) return res.status(404).json({ message: 'No request found for this user' });
+    res.json({ status: request.status, createdAt: request.createdAt, education: request.education, userSnapshot: request.userSnapshot });
   } catch (error) {
-    console.error('Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = {
-  getRequestStatus,
-  getCurrentRequestStatus,
-};
+module.exports = { create, read, readOne, update, updateStatus, updateEducation, remove, getRequestStatus };
