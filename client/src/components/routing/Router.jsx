@@ -5,7 +5,7 @@ import FromStepTwo from "../FromStepTwo";
 import Login from "../Login";
 import Register from "../Register";
 import Navbar from "./NavBar";
-import ScholarshipStatus from "../statusRequest (2).jsx";
+import ScholarshipStatus from "../statusRequest.jsx";
 import HeaderSteps from "../HeadSteps";
 
 // ─── FIX: redirect to /login if not authenticated ────────────────────────────
