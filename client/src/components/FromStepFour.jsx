@@ -3,6 +3,7 @@ import { useForm } from'react-hook-form'; // 1. מייבאים את הספריי
 
 export default function BankDetailsStep({ nextStep, prevStep }) {
   
+  
   // פונקציית בדיקת תקינות תעודת זהות ישראלית
   const isValidTZ = (id) => {
     if (!/^\d{9}$/.test(id)) return false;
@@ -157,8 +158,8 @@ export default function BankDetailsStep({ nextStep, prevStep }) {
           </svg>
         </button>
       </div>
-
     </div>
+    
   );
 }
 // import React from 'react';

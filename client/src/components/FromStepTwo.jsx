@@ -1,9 +1,9 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 
-// שימי לב שהוספנו כאן את setFormData שאנחנו צריכים לקבל מהאבא
 export default function FromStepTwo({ nextStep, prevStep, formData, setFormData, saveDraft }) {
   
+  // בדיקת תקינות תעודת זהות
   const isValidTZ = (id) => {
     if (!/^\d{9}$/.test(id)) return false;
     return Array.from(id, Number).reduce((acc, val, i) => {

@@ -13,6 +13,10 @@ export default function HeaderSteps() {
   const currentStep = Number(searchParams.get('step')) || 1;
   const [requestId, setRequestId] = useState(null);
 
+  // הגדרת מפתח ייחודי לטיוטה עבור כל משתמש
+  const userName = localStorage.getItem('userFirstName') || 'guest';
+  const draftKey = `draft_${userName}`;
+
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד
   const [formData, setFormData] = useState({
     // שדות שלב 4 (פרטי בנק)
@@ -23,19 +27,22 @@ export default function HeaderSteps() {
     // ניתן להוסיף כאן עוד שדות לשאר השלבים...
   });
 
-  // טעינת הטיוטה הגלובלית כשהאפליקציה עולה
+  // טעינת הטיוטה האישית כשהאפליקציה עולה
   useEffect(() => {
-    const savedGlobalDraft = localStorage.getItem('globalFormDraft');
-    if (savedGlobalDraft) { // תוקן: כאן הייתה שגיאת ההקלדה
-      setFormData(JSON.parse(savedGlobalDraft));
+    const savedPersonalDraft = localStorage.getItem(draftKey);
+    if (savedPersonalDraft) {
+      setFormData(JSON.parse(savedPersonalDraft));
     }
-  }, []); // רץ פעם אחת בטעינה הראשונית
+  }, [draftKey]); // ירוץ שוב רק אם המשתמש התחלף
 
-  // פונקציה גלובלית לשמירת הטיוטה (מעודכנת כדי לתמוך בשלב 2)
+  // פונקציה גלובלית לשמירת הטיוטה (שומרת תחת השם האישי)
   const handleSaveDraft = (childData = {}) => {
     const dataToSave = { ...formData, ...childData }; // ממזג את המידע מהאבא עם המידע מהילד
     setFormData(dataToSave);
-    localStorage.setItem('globalFormDraft', JSON.stringify(dataToSave));
+    
+    // שומרים ב-localStorage תחת המפתח האישי של המשתמש
+    localStorage.setItem(draftKey, JSON.stringify(dataToSave)); 
+    
     alert('כל הנתונים נשמרו כטיוטה בהצלחה!');
   };
 
@@ -73,11 +80,11 @@ export default function HeaderSteps() {
         );
 
       case 2:
-        // תוקן: הוספנו את setFormData כדי ששלב 2 יוכל לעדכן את האבא
         return <FromStepTwo nextStep={goToNextStep} prevStep={goToPrevStep} formData={formData} setFormData={setFormData} currentStep={currentStep} saveDraft={handleSaveDraft} />;
 
       case 3:
         return (
+<<<<<<< HEAD
           <Step3Studies
             nextStep={goToNextStep}
             prevStep={goToPrevStep}
@@ -99,16 +106,60 @@ export default function HeaderSteps() {
             setFormData={setFormData}
             saveDraft={handleSaveDraft}
           />
+=======
+         <Step3Studies
+          nextStep={goToNextStep}
+          prevStep={goToPrevStep}
+          currentStep={currentStep}
+          requestId={requestId}
+        />
+>>>>>>> end
         );
+      case 4:
+        return (
+          <FromStepFour
+            nextStep={goToNextStep}
+            prevStep={goToPrevStep}
+            currentStep={currentStep}
+            requestId={requestId}
+          />
+        );    
+      case 5:
+        return (
+          <FormStep5  
+            nextStep={goToNextStep}
+            prevStep={goToPrevStep}
+          />
+        );  
 
       case 6:
         return (
+<<<<<<< HEAD
       <SubmitRequestStep
       prevStep={goToPrevStep}
       currentStep={currentStep}
       saveDraft={handleSaveDraft}
       //  onSubmit={handleFinalSubmit}
        />
+=======
+          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
+            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 6: אישור ושליחה</h2>
+            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
+            <div className="flex justify-center gap-4">
+              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
+              <button 
+                onClick={() => {
+                  alert('הטופס נשלח בהצלחה! (בכאילו)');
+                  // מוחק רק את הטיוטה של המשתמש הספציפי בסיום התהליך
+                  localStorage.removeItem(draftKey); 
+                }} 
+                className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold"
+              >
+                שלח בקשה סופית
+              </button>
+            </div>
+          </div>
+>>>>>>> end
         );
 
       default:

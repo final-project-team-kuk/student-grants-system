@@ -42,9 +42,13 @@ export default function Login({ auth }) {
       const data = await response.json();
 
       if (response.ok) {
+<<<<<<< HEAD
         // ─── FIX: store user + token in auth state & localStorage ────────────
         auth.login(data.user, data.token);
 
+=======
+        localStorage.setItem('userFirstName', data.user.firstName);
+>>>>>>> end
         Swal.fire({
           icon: 'success',
           title: `ברוך הבא, ${data.user.firstName}!`,
