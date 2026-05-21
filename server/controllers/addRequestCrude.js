@@ -102,4 +102,61 @@ const remove = (req, res) => {
     });
 };
 
-module.exports = { create, read, readOne, update, updateStatus, remove };
+// ─── UPDATE STEP ONE (הפונקציה החדשה שלנו) ───────────────────────────────────
+// POST או PUT /api/requests/step-one
+// מעדכן את נתוני שלב 1 ומבצע בדיקות תקינות
+const updateStepOne = (req, res) => {
+  const { nationalId, firstName, lastName, personal, requestId } = req.body;
+
+  // 1. בדיקות תקינות (ולידציות)
+  if (!nationalId || !firstName || !lastName) {
+    return res.status(400).send({ error: "חובה למלא מספר זהות, שם פרטי ושם משפחה." });
+  }
+  if (nationalId.trim().length !== 9) {
+    return res.status(400).send({ error: "מספר זהות חייב להכיל בדיוק 9 ספרות." });
+  }
+  if (!personal || !personal.birthDate || !personal.city || !personal.address || !personal.mobile) {
+    return res.status(400).send({ error: "חובה למלא את כל פרטי המגורים והטלפון הנייד." });
+  }
+
+  // 2. הכנת המבנה המדויק לעדכון לפי המודל שלכם
+  const updateData = {
+    userSnapshot: {
+      nationalId: nationalId.trim(),
+      firstName: firstName.trim(),
+      lastName: lastName.trim()
+    },
+    personal: {
+      birthDate: personal.birthDate,
+      city: personal.city.trim(),
+      address: personal.address.trim(),
+      phone: personal.phone ? personal.phone.trim() : "",
+      mobile: personal.mobile.trim()
+    }
+  };
+
+  // 3. שמירה בבסיס הנתונים
+  // אם יש לנו כבר requestId (כי הוא שמר טיוטה או עבר שלב), נעדכן אותה. 
+  // אם אין, נחפש לפי תעודת זהות או ניצור חדש (upsert)
+  const filter = requestId ? { _id: requestId } : { "userSnapshot.nationalId": nationalId.trim() };
+
+  requestModel.findOneAndUpdate(
+    filter,
+    { $set: updateData },
+    { new: true, upsert: true, runValidators: true }
+  )
+    .then(request => {
+      return res.status(200).send({
+        success: true,
+        message: "שלב 1 נשמר בהצלחה!",
+        requestId: request._id, // מחזירים את ה-ID כדי שהשלבים הבאים ידעו לעדכן את אותה בקשה
+        data: request
+      });
+    })
+    .catch(error => {
+      return res.status(500).send({ error: error.message });
+    });
+};
+
+module.exports = { create, read, readOne, update, updateStatus, remove, updateStepOne };
+

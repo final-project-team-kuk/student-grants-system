@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 // ייבוא הקומפוננטות המוכנות בלבד
+import FromStepOne from './FromStepOne'; // השלב הראשון החדש!
 import FromStepTwo from './FromStepTwo'; 
 import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
 
@@ -11,6 +12,17 @@ export default function HeaderSteps() {
 
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד, כדי ששום דבר לא ייאבד במעברים
   const [formData, setFormData] = useState({
+    // שדות שלב 1 (פרטים אישיים)
+   nationalId: '',
+    firstName: '',
+    lastName: '',
+    personal: {
+      birthDate: '',
+      city: '',
+      address: '',
+      phone: '',
+      mobile: '',
+      },
     // שדות שלב 2 (פרטי משפחה) - יתווספו כאן לפי הצורך
     
     // שדות שלב 4 (פרטי בנק)
@@ -21,12 +33,25 @@ export default function HeaderSteps() {
   });
 
   // פונקציית עדכון השדות הגלובלית
+  // פונקציית עדכון השדות הגלובלית - תומכת גם בשדות רגילים וגם בשדות מקוננים (עם נקודה)
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData((prev) => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   // פונקציות ניווט (מעבר בין 1 ל-6)
@@ -44,13 +69,8 @@ export default function HeaderSteps() {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 1: פרטים אישיים</h2>
-            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
-            <button onClick={goToNextStep} className="px-6 py-2 bg-[#071325] text-white rounded-lg font-bold">דילוג לשלב הבא</button>
-          </div>
-        );
+  // מחקנו את התיבה הריקה ושמנו את הטופס האמיתי של שלב 1
+  return <FromStepOne formData={formData} handleChange={handleChange} nextStep={goToNextStep} />;
 
       case 2:
         // ✅ שלב 2 מוכן ומחובר!

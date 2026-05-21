@@ -6,7 +6,8 @@ const {
   readOne,
   update,
   updateStatus,
-  remove
+  remove,
+  updateStepOne
 } = require("../controllers/addRequestCrude");
 
 const router = Router();
@@ -17,6 +18,7 @@ router.get   ("/",           read);          // get all (+ optional filters)
 router.get   ("/:id",        readOne);       // get one by id
 router.put   ("/:id",        update);        // update any fields
 router.patch ("/:id/status", updateStatus);  // change status only
-router.delete("/:id",        remove);        // delete
+router.delete("/:id",        remove); 
+router.post   ("/step-one",   updateStepOne);       // delete
 
 module.exports = router;
