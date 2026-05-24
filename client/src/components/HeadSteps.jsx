@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 // ייבוא הקומפוננטות המוכנות בלבד
-import FromStepTwo from './FromStepTwo'; 
+import FromStepTwo from './FromStepTwo';
 import FromStepFour from './FromStepFour'; // שלב 4 של פרטי הבנק
+import FromStepSix from './step6-confirm';
+
 
 export default function HeaderSteps() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,7 +14,9 @@ export default function HeaderSteps() {
   // ה-State המרכזי שומר את כל נתוני הטופס ביחד, כדי ששום דבר לא ייאבד במעברים
   const [formData, setFormData] = useState({
     // שדות שלב 2 (פרטי משפחה) - יתווספו כאן לפי הצורך
-    
+    fatherId: '',
+    fatherLastName: '',
+    fatherFirstName: '',
     // שדות שלב 4 (פרטי בנק)
     accountHolderId: '',
     bankName: '',
@@ -35,6 +39,20 @@ export default function HeaderSteps() {
   };
   const goToPrevStep = () => {
     if (currentStep > 1) setSearchParams({ step: currentStep - 1 });
+  };
+
+  // לוגיקת שליחה סופית
+  const handleFinalSubmit = () => {
+    console.log("שולח נתונים לשרת...", formData);
+    // כאן תכניסי את ה-fetch שלך
+  };
+
+  // לוגיקת ביטול (איפוס הכל)
+  const handleCancelAll = () => {
+    if (window.confirm("האם את בטוחה שברצונך לבטל את הבקשה?")) {
+      setFormData({}); // איפוס הנתונים
+      setStep(1);      // חזרה לשלב הראשון
+    }
   };
 
   // רשימת ששת השלבים המלאה להצגה ב-Stepper
@@ -84,16 +102,15 @@ export default function HeaderSteps() {
           </div>
         );
 
+
       case 6:
         return (
-          <div className="bg-white border border-[#e2dfd8] rounded-2xl p-8 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-[#071325] mb-2">שלב 6: אישור ושליחה</h2>
-            <p className="text-gray-500 mb-6">הקומפוננטה הזו עדיין בבנייה...</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={() => alert('הטופס נשלח בהצלחה! (בכאילו)')} className="px-6 py-2 bg-green-700 text-white rounded-lg font-bold">שלח בקשה סופית</button>
-              <button onClick={goToPrevStep} className="px-6 py-2 border border-[#d5c9b5] text-[#071325] rounded-lg">חזור</button>
-            </div>
-          </div>
+          <FromStepSix
+            formData={formData}               
+            prevStep={goToPrevStep}            // הפונקציה הקיימת שלך למעבר אחורה
+            handleCancel={handleCancelAll}     // הפונקציה שלך לביטול
+            handleSubmit={handleFinalSubmit}   // הפונקציה שלך לשליחה
+          />
         );
 
       default:
@@ -107,7 +124,7 @@ export default function HeaderSteps() {
   return (
     <div className="min-h-screen bg-[#f4f2ec] py-12" dir="rtl">
       <div className="max-w-3xl mx-auto px-4 pb-12">
-        
+
         {/* כותרת קבועה לכל השלבים */}
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold text-[#071325] mb-2">הגשת בקשה למענק</h1>
@@ -117,7 +134,7 @@ export default function HeaderSteps() {
         {/* ה-Stepper המרכזי והחכם */}
         <div className="flex justify-between items-center mb-12 relative px-4">
           <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#d5c9b5] -z-10"></div>
-          <div 
+          <div
             className="absolute top-4 h-[2px] bg-[#071325] -z-10 transition-all duration-300"
             style={{ width: progressWidth, right: '32px' }}
           ></div>
@@ -130,13 +147,12 @@ export default function HeaderSteps() {
             return (
               <div key={stepNum} className="flex flex-col items-center gap-2">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors ${
-                    isCompleted
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors ${isCompleted
                       ? 'bg-[#071325] border-[#071325] text-white'
                       : isActive
-                      ? 'bg-white border-[#071325] text-[#071325] font-bold'
-                      : 'bg-white border-[#d5c9b5] text-[#071325]'
-                  }`}
+                        ? 'bg-white border-[#071325] text-[#071325] font-bold'
+                        : 'bg-white border-[#d5c9b5] text-[#071325]'
+                    }`}
                 >
                   {isCompleted ? '✓' : stepNum}
                 </div>
@@ -161,8 +177,8 @@ export default function HeaderSteps() {
 // import { useSearchParams } from 'react-router-dom';
 
 // // ייבוא הקומפוננטות. ודאי שיש לך קבצים עבור השלבים האחרים שאינם בהערה
-// // import FromStepOne from './FromStepOne'; 
-// import FromStepTwo from './FromStepTwo'; 
+// // import FromStepOne from './FromStepOne';
+// import FromStepTwo from './FromStepTwo';
 // //import FromStepOne from './FromStepOne';
 // export default function HeaderSteps() {
 //   const [searchParams, setSearchParams] = useSearchParams();

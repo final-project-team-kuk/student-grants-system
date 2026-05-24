@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 
 const gradCap = (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="#F5F1E9" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18V17l7 4 7-4v-3.82L12 17l-7-3.82z"/>
+    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18V17l7 4 7-4v-3.82L12 17l-7-3.82z" />
   </svg>
 );
 
@@ -38,10 +38,20 @@ export default function Register() {
     if (!form.lastName.trim()) tempErrors.lastName = "שם משפחה הוא שדה חובה";
     else if (!nameRegex.test(form.lastName.trim())) tempErrors.lastName = "שם משפחה חייב להכיל אותיות בלבד";
     else if (form.lastName.trim().length < 2) tempErrors.lastName = "שם משפחה חייב להכיל לפחות 2 אותיות";
-    
-    // כאן השינוי היחיד שביקשת - בדיקה של בדיוק 9 ספרות
-    if (!form.idNumber.trim()) tempErrors.idNumber = "מספר זהות הוא שדה חובה";
-    else if (!/^\d{9}$/.test(form.idNumber.trim())) tempErrors.idNumber = "מספר זהות חייב להכיל בדיוק 9 ספרות";
+
+    if (!form.idNumber.trim()) { tempErrors.idNumber = "מספר זהות הוא שדה חובה"; }
+    else if (!/^\d{9}$/.test(form.idNumber.trim())) { tempErrors.idNumber = "מספר זהות חייב להכיל בדיוק 9 ספרות"; } else {
+      // בדיקת ספרת ביקורת (אלגוריתם מודולו 10)
+      const id = form.idNumber.trim();
+      let sum = 0;
+      for (let i = 0; i < 9; i++) {
+        let digit = parseInt(id[i], 10) * ((i % 2) + 1);
+        sum += digit > 9 ? digit - 9 : digit;
+      }
+      if (sum % 10 !== 0) {
+        tempErrors.idNumber = "מספר זהות לא תקין";
+      }
+    }
 
     if (!form.email.trim()) tempErrors.email = "כתובת אימייל היא שדה חובה";
     else if (!emailRegex.test(form.email.trim())) tempErrors.email = "כתובת האימייל אינה תקינה";
@@ -145,7 +155,7 @@ export default function Register() {
         </div>
 
         <div className="w-full flex flex-col bg-white/70 backdrop-blur-[18px] border border-[#0A192F]/10 rounded-[20px] p-7 gap-[18px] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
-          
+
           <div className="flex rounded-xl bg-[#E5E0D5] p-1 gap-1">
             <button type="button" style={{ flex: 1 }} className="py-2.5 rounded-[9px] text-[15px] font-[600] bg-[#0A192F] text-[#F5F1E9] shadow-[0_4px_14px_rgba(10,25,47,0.2)]">
               הרשמה
@@ -164,9 +174,8 @@ export default function Register() {
                 onChange={handleChange(key)}
                 placeholder={placeholder}
                 dir="rtl"
-                className={`w-full bg-white border rounded-xl py-3 px-[18px] text-[#0A192F] text-[15px] text-right placeholder-[#A0AEC0] transition-all duration-200 outline-none focus:border-[#0A192F] focus:ring-[3px] focus:ring-[#0A192F]/15 ${
-                  errors[key] ? "border-[#E53E3E] focus:border-[#E53E3E] focus:ring-[#E53E3E]/15" : "border-[#D1D5DB]"
-                }`}
+                className={`w-full bg-white border rounded-xl py-3 px-[18px] text-[#0A192F] text-[15px] text-right placeholder-[#A0AEC0] transition-all duration-200 outline-none focus:border-[#0A192F] focus:ring-[3px] focus:ring-[#0A192F]/15 ${errors[key] ? "border-[#E53E3E] focus:border-[#E53E3E] focus:ring-[#E53E3E]/15" : "border-[#D1D5DB]"
+                  }`}
               />
               {errors[key] && <span className="text-[#E53E3E] text-xs text-right font-medium mt-0.5">{errors[key]}</span>}
             </div>
